@@ -20,6 +20,7 @@ export const capabilities: Readonly<Record<CapabilityFlag, Readonly<CapabilityEn
   'context.invalidJsonIsBadRequest': { kind: 'divergence', convergence: 'WP-58' },
   'streaming.sseErrorCallbackOwnsOutput': { kind: 'divergence', convergence: 'WP-59' },
   'streaming.sseWriterStateIsLive': { kind: 'divergence', convergence: 'WP-60' },
+  'static.overrideNotFoundContinuesToHandler': { kind: 'divergence', convergence: 'WP-61' },
   'optional.notFoundHook': {
     kind: 'optional',
     description: 'AsenaAdapter.onNotFound is optional; without it a config onNotFound hook is never called.',

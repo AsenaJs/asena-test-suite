@@ -37,7 +37,8 @@ export type DivergenceFlag =
   | 'context.absentValuesMatchDeclaredTypes'
   | 'context.invalidJsonIsBadRequest'
   | 'streaming.sseErrorCallbackOwnsOutput'
-  | 'streaming.sseWriterStateIsLive';
+  | 'streaming.sseWriterStateIsLive'
+  | 'static.overrideNotFoundContinuesToHandler';
 
 export type CapabilityFlag = OptionalFlag | DivergenceFlag;
 

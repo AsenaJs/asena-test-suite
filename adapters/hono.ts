@@ -45,6 +45,7 @@ export const divergences: Partial<Record<DivergenceFlag, false>> = {
   'context.invalidJsonIsBadRequest': false,
   'streaming.sseErrorCallbackOwnsOutput': false,
   'streaming.sseWriterStateIsLive': false,
+  'static.overrideNotFoundContinuesToHandler': false,
 };
 
 export default descriptor;
