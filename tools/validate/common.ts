@@ -4,7 +4,7 @@ import { join, relative, resolve, sep } from 'node:path';
 export const suiteRoot = resolve(import.meta.dir, '..', '..');
 
 export interface Finding {
-  check: 'imports' | 'identity' | 'manifests' | 'parity' | 'flags';
+  check: 'imports' | 'identity' | 'manifests' | 'parity' | 'flags' | 'packed';
   rule: string;
   file: string;
   line?: number;

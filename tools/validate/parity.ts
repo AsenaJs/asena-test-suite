@@ -96,7 +96,7 @@ function expectedSegment(part: 'P1' | 'P2', testCase: Case): string[] | undefine
   return undefined;
 }
 
-function idOf(testCase: Case): string | undefined {
+export function idOf(testCase: Case): string | undefined {
   return ID.exec(testCase.name)?.[1];
 }
 
@@ -255,7 +255,7 @@ interface Spawned {
   exitCode: number;
 }
 
-function cleanEnv(extra: Record<string, string>): Record<string, string> {
+export function cleanEnv(extra: Record<string, string>): Record<string, string> {
   const env: Record<string, string> = {};
 
   for (const [key, value] of Object.entries(process.env)) {
@@ -317,6 +317,22 @@ export function runRogueEntries(root: string, quiet = true): RogueResult[] {
   });
 }
 
+export function runP1(root: string, selector: Selector, report: string, quiet: boolean): void {
+  rmSync(report, { force: true });
+  spawn(
+    [process.execPath, 'test', './test/', '--reporter=junit', `--reporter-outfile=${report}`],
+    join(root, 'packages', 'conformance'),
+    cleanEnv({ ASENA_ADAPTER: selector }),
+    quiet,
+  );
+}
+
+export async function loadDivergences(root: string, selector: Selector): Promise<Record<string, unknown>> {
+  const mod = (await import(join(root, 'adapters', `${selector}.ts`))) as { divergences?: Record<string, unknown> };
+
+  return mod.divergences ?? {};
+}
+
 export async function runParity(root: string, quiet = false): Promise<ParityResult> {
   const out = join(root, 'out');
   const inputs: ParityInputs = { p1: {}, p2: {}, entry: {}, rogue: [], divergences: {}, missingReports: [] };
@@ -325,9 +341,7 @@ export async function runParity(root: string, quiet = false): Promise<ParityResu
 
   for (const selector of SELECTORS) {
     const adapterModule = join(root, 'adapters', `${selector}.ts`);
-    const mod = (await import(adapterModule)) as { divergences?: Record<string, unknown> };
-
-    inputs.divergences[selector] = mod.divergences ?? {};
+    inputs.divergences[selector] = await loadDivergences(root, selector);
 
     const p1 = join(out, `p1-${selector}.xml`);
     const p2 = join(out, `p2-${selector}.xml`);
@@ -336,12 +350,7 @@ export async function runParity(root: string, quiet = false): Promise<ParityResu
 
     for (const file of [p1, p2, entryXml]) rmSync(file, { force: true });
 
-    spawn(
-      [process.execPath, 'test', './test/', '--reporter=junit', `--reporter-outfile=${p1}`],
-      join(root, 'packages', 'conformance'),
-      cleanEnv({ ASENA_ADAPTER: selector }),
-      quiet,
-    );
+    runP1(root, selector, p1, quiet);
     spawn(
       [process.execPath, join(root, 'ecosystem', 'run.ts'), '--reporter=junit', '--out', p2],
       root,

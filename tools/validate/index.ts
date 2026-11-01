@@ -3,21 +3,40 @@ import { checkFlags } from './flags.ts';
 import { checkIdentity } from './identity.ts';
 import { checkImports } from './imports.ts';
 import { checkManifests } from './manifests.ts';
+import { formatDifferences, resolveWorkspace, runPacked } from './packed/run.ts';
 import { runParity } from './parity.ts';
 
-const args = new Set(process.argv.slice(2).filter((arg) => arg !== '--'));
-const unknown = [...args].filter((arg) => !['--fast', '--packed'].includes(arg));
+const USAGE =
+  'usage: bun run validate [-- --fast | --only <1|2|3|4|4b|5> | --packed] [--workspace <dir>] [--keep] (4b: --workspace, --keep)';
+const CHECKS = ['1', '2', '3', '4', '4b', '5'] as const;
 
-if (unknown.length > 0) {
-  console.error(`validate: unknown argument(s) ${unknown.join(' ')}; usage: bun run validate [-- --fast | --packed]`);
-  process.exit(64);
+type Check = (typeof CHECKS)[number];
+
+function parseArgs(argv: string[]): { checks: Set<Check>; workspace?: string; keep: boolean } {
+  const rest = argv.filter((arg) => arg !== '--');
+  let checks = new Set<Check>(['1', '2', '3', '5', '4', '4b']);
+  let workspace: string | undefined;
+  let keep = false;
+  const only = new Set<Check>();
+
+  for (let index = 0; index < rest.length; index++) {
+    const arg = rest[index];
+
+    if (arg === '--fast') checks = new Set(['1', '2', '3', '5']);
+    else if (arg === '--packed') only.add('4b');
+    else if (arg === '--keep') keep = true;
+    else if (arg === '--only' && CHECKS.includes(rest[index + 1] as Check)) only.add(rest[++index] as Check);
+    else if (arg === '--workspace' && rest[index + 1]) workspace = rest[++index];
+    else {
+      console.error(`validate: unknown or incomplete argument '${arg}'; ${USAGE}`);
+      process.exit(64);
+    }
+  }
+
+  return { checks: only.size > 0 ? only : checks, workspace, keep };
 }
 
-if (args.has('--packed')) {
-  console.log('validate: --packed (check 4b, bit 32) is not wired yet');
-  process.exit(0);
-}
-
+const { checks, workspace: workspaceArg, keep } = parseArgs(process.argv.slice(2));
 let exitCode = 0;
 
 function emit(name: keyof typeof BITS, findings: Finding[], note = ''): void {
@@ -30,15 +49,32 @@ function emit(name: keyof typeof BITS, findings: Finding[], note = ''): void {
   if (findings.length > 0) exitCode |= BITS[name];
 }
 
-emit('imports', checkImports(suiteRoot));
-emit('identity', checkIdentity(suiteRoot));
-emit('manifests', checkManifests(suiteRoot));
-emit('flags', await checkFlags(suiteRoot));
+if (checks.has('1')) emit('imports', checkImports(suiteRoot));
+if (checks.has('2')) emit('identity', checkIdentity(suiteRoot));
+if (checks.has('3')) emit('manifests', checkManifests(suiteRoot));
+if (checks.has('5')) emit('flags', await checkFlags(suiteRoot));
 
-if (!args.has('--fast')) {
+if (checks.has('4')) {
   const parity = await runParity(suiteRoot);
 
   emit('parity', parity.findings, `; other failing tests: ${parity.otherFailures}`);
+}
+
+if (checks.has('4b')) {
+  const workspace = resolveWorkspace(suiteRoot, workspaceArg, process.env.ASENA_SUITE_WORKSPACE);
+  const packed = await runPacked(suiteRoot, { workspace, keep, reuseP1: checks.has('4') });
+
+  for (const leg of packed.legs) {
+    console.log(
+      `validate: packed ${leg.adapter} ${leg.variant} v${leg.version} (${leg.seconds.toFixed(1)} s): ` +
+        `P1 ${leg.p1}, packed ${leg.packed}`,
+    );
+    console.log(`  expected divergence failures: ${leg.expectedFailures.join(', ') || '(none)'}`);
+    for (const line of formatDifferences(leg.differences)) console.log(line);
+  }
+
+  if (keep) console.log(`validate: packed projects kept in ${packed.tmp}`);
+  emit('packed', packed.findings, `; variant ${workspace ? `archive (${workspace})` : 'npm'}`);
 }
 
 console.log(`validate: exit ${exitCode}`);
