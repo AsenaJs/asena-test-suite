@@ -1,0 +1,11 @@
+node_modules
+.local-packs
+out
+dist
+bun.lock
+*.md
+**/fixtures/**/*.html
+**/fixtures/**/*.css
+**/fixtures/**/*.json
+**/fixtures/**/*.txt
+tools/validate/fixtures

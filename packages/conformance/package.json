@@ -1,0 +1,44 @@
+{
+  "name": "@asenajs/adapter-conformance",
+  "version": "0.12.0-dev.0",
+  "description": "Adapter conformance suite for AsenaJS: proves an AsenaAdapter implementation behaves the way Asena expects",
+  "type": "module",
+  "license": "MIT",
+  "author": "LibirSoft",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AsenaJs/asena-test-suite.git",
+    "directory": "packages/conformance"
+  },
+  "engines": {
+    "bun": ">=1.4.0"
+  },
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./helpers": {
+      "types": "./dist/helpers/index.d.ts",
+      "default": "./dist/helpers/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "bun scripts/build.ts",
+    "prepack": "bun run build"
+  },
+  "peerDependencies": {
+    "@asenajs/asena": "^0.12.0",
+    "zod": "^4.3.6"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
+  }
+}

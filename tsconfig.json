@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "include": [
+    "adapters/**/*.ts",
+    "tools/**/*.ts",
+    "packages/*/src/**/*.ts",
+    "packages/*/test/**/*.ts",
+    "packages/*/scripts/**/*.ts",
+    "ecosystem/**/*.ts"
+  ],
+  "exclude": ["**/node_modules", "**/dist", "**/out", ".local-packs"]
+}
