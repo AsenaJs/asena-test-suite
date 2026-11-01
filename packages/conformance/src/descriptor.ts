@@ -35,7 +35,9 @@ export type DivergenceFlag =
   | 'middleware.codeAfterNextRuns'
   | 'routing.unmatchedRoutePatternUnset'
   | 'context.absentValuesMatchDeclaredTypes'
-  | 'context.invalidJsonIsBadRequest';
+  | 'context.invalidJsonIsBadRequest'
+  | 'streaming.sseErrorCallbackOwnsOutput'
+  | 'streaming.sseWriterStateIsLive';
 
 export type CapabilityFlag = OptionalFlag | DivergenceFlag;
 

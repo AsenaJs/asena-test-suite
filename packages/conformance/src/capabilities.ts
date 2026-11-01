@@ -18,6 +18,8 @@ export const capabilities: Readonly<Record<CapabilityFlag, Readonly<CapabilityEn
   'routing.unmatchedRoutePatternUnset': { kind: 'divergence', convergence: 'WP-56' },
   'context.absentValuesMatchDeclaredTypes': { kind: 'divergence', convergence: 'WP-57' },
   'context.invalidJsonIsBadRequest': { kind: 'divergence', convergence: 'WP-58' },
+  'streaming.sseErrorCallbackOwnsOutput': { kind: 'divergence', convergence: 'WP-59' },
+  'streaming.sseWriterStateIsLive': { kind: 'divergence', convergence: 'WP-60' },
   'optional.notFoundHook': {
     kind: 'optional',
     description: 'AsenaAdapter.onNotFound is optional; without it a config onNotFound hook is never called.',
