@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { join } from 'node:path';
-import { type Finding, rel, sourceFiles, suiteRoot } from './common.ts';
+import { type Finding, isExempt, rel, sourceFiles, suiteRoot } from './common.ts';
 import { type FlagInputs, judgeFlags, loadFlagInputs } from './flags.ts';
 import { checkIdentity } from './identity.ts';
 import { checkImports } from './imports.ts';
@@ -80,6 +80,11 @@ describe('identity (bit 2)', () => {
     'packages/conformance/src/areas/enum-json/scenarios.ts': 'descriptor-enumeration',
     'packages/conformance/src/areas/cast-any/scenarios.ts': 'contract-cast',
     'packages/conformance/src/areas/cli-outside/scenarios.ts': 'optional-member-read',
+  });
+
+  it('the third-party examples are exempt; the package source is not', () => {
+    expect(isExempt('packages/conformance/examples/conformance.test.ts')).toBe(true);
+    expect(isExempt('packages/conformance/src/run.ts')).toBe(false);
   });
 });
 

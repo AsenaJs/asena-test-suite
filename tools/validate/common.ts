@@ -30,6 +30,7 @@ export const EXEMPT = [
   'packages/conformance/src/maintainer.ts',
   'packages/conformance/src/areas/resolution/',
   'packages/conformance/test/00-resolution.test.ts',
+  'packages/conformance/examples/',
 ];
 
 export function toPosix(path: string): string {

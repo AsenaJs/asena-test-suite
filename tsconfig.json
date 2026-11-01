@@ -6,6 +6,7 @@
     "packages/*/src/**/*.ts",
     "packages/*/test/**/*.ts",
     "packages/*/scripts/**/*.ts",
+    "packages/*/examples/**/*.ts",
     "ecosystem/**/*.ts"
   ],
   "exclude": ["**/node_modules", "**/dist", "**/out", ".local-packs", "tools/validate/fixtures"]
