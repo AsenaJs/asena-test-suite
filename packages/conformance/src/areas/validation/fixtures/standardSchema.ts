@@ -90,23 +90,6 @@ export function object<S extends Record<string, Checked<unknown>>>(
   });
 }
 
-/** Accepts anything, records what it was given. */
-export function recording<T = unknown>(log: unknown[]): Checked<T> {
-  return make(
-    (value) => ({ value: value as T, issues: [] }),
-    (value) => log.push(value),
-  );
-}
-
-/** Always fails with `message`; records that it ran under `label`. */
-export function rejecting(label: string, order: string[], message = `${label} rejected`): Checked<never> {
-  return make(
-    (_value, path) => failure(message, path),
-    () => order.push(label),
-  );
-}
-
-/** Wraps a schema so each validation is logged under `label` before it runs. */
 export function traced<T>(label: string, order: string[], inner: Checked<T>): Checked<T> {
   return make(
     (value, path) => inner[CHECK](value, path),

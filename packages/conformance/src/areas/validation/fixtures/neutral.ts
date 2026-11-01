@@ -13,7 +13,6 @@ export interface RegistrarFixture {
   calls: { handler: number };
 }
 
-/** Registers one route through the injected adapter from `@OnStart`, the way a third-party package does. */
 export function registrarFixture(extra: Record<string, unknown>): RegistrarFixture {
   const calls = { handler: 0 };
 

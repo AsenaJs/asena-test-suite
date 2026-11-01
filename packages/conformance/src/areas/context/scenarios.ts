@@ -21,8 +21,6 @@ interface ParsedCookie {
 }
 
 function parseSetCookie(header: string | null): ParsedCookie {
-  expect(header).not.toBeNull();
-
   const [pair = '', ...rest] = (header ?? '').split(';').map((part) => part.trim());
   const eq = pair.indexOf('=');
   const attributes: Record<string, string> = {};

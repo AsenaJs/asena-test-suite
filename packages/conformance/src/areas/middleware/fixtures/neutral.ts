@@ -75,7 +75,6 @@ export interface OrderFixture {
   order: string[];
 }
 
-/** Global, controller and route middlewares that append their label to `order`. */
 export function orderMiddlewares(order: string[]) {
   @Middleware()
   class MiddlewareOrderGlobal extends AsenaMiddlewareService {
