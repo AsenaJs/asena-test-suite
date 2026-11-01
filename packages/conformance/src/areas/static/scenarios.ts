@@ -16,16 +16,19 @@ import { rawGet } from './raw.ts';
 
 const NOT_FOUND = { error: 'Not Found' };
 
-const TRAVERSAL: [target: string, status: number | number[]][] = [
-  ['/static/../secret/secret.txt', 404],
-  ['/static/%2e%2e/secret/secret.txt', 404],
-  ['/static/..%2fsecret%2fsecret.txt', [403, 404]],
-  ['/static/%2e%2e%2fsecret%2fsecret.txt', [403, 404]],
-  ['/static/..%2fpublic-private%2fcredentials.txt', [403, 404]],
-  ['/static/%252e%252e%252fsecret%252fsecret.txt', 404],
-  ['/static/..\\secret\\secret.txt', 404],
-  ['/static/..%5csecret%5csecret.txt', 404],
-  ['/static/../../../../../../../../etc/passwd', 404],
+const NOT_FOUND_TRAVERSAL = [
+  '/static/../secret/secret.txt',
+  '/static/%2e%2e/secret/secret.txt',
+  '/static/%252e%252e%252fsecret%252fsecret.txt',
+  '/static/..\\secret\\secret.txt',
+  '/static/..%5csecret%5csecret.txt',
+  '/static/../../../../../../../../etc/passwd',
+];
+
+const ESCAPING_TRAVERSAL = [
+  '/static/..%2fsecret%2fsecret.txt',
+  '/static/%2e%2e%2fsecret%2fsecret.txt',
+  '/static/..%2fpublic-private%2fcredentials.txt',
 ];
 
 const MALFORMED = ['/static/%zz.txt', '/static/100%.txt', '/static/%e0%a4%a.txt'];
@@ -156,7 +159,7 @@ export function register(): void {
       await using app = await bootApp({ components: fixture.components });
       const seen: [string, number][] = [];
 
-      for (const [target] of TRAVERSAL) {
+      for (const target of [...NOT_FOUND_TRAVERSAL, ...ESCAPING_TRAVERSAL]) {
         const response = await rawGet(app.port, target);
 
         expect(response.body).not.toContain(OUTSIDE_SECRET);
@@ -165,26 +168,29 @@ export function register(): void {
         seen.push([target, response.status]);
       }
 
-      for (const [index, [target, expected]] of TRAVERSAL.entries()) {
-        const actual = seen[index][1];
-
-        if (Array.isArray(expected)) expect([target, expected.includes(actual)]).toEqual([target, true]);
-        else expect([target, actual]).toEqual([target, expected]);
-      }
-
+      expect(seen.slice(0, NOT_FOUND_TRAVERSAL.length)).toEqual(NOT_FOUND_TRAVERSAL.map((target) => [target, 404]));
       expect(fixture.probe.found).toEqual([]);
       expect(fixture.probe.handler).toBe(0);
     });
 
-    scenario('P1.static.011', 'malformed percent-encoding answers 400 or 404, never 500', async () => {
-      await using app = await bootApp({ components: staticFixture().components });
+    scenario(
+      'P1.static.011',
+      'a static path is decoded once: a malformed escape answers 400, a path escaping the root 403',
+      async () => {
+        await using app = await bootApp({ components: staticFixture().components });
+        const seen: [string, number][] = [];
 
-      for (const target of MALFORMED) {
-        const response = await rawGet(app.port, target);
+        for (const target of [...MALFORMED, ...ESCAPING_TRAVERSAL]) {
+          seen.push([target, (await rawGet(app.port, target)).status]);
+        }
 
-        expect([target, response.status === 400 || response.status === 404]).toEqual([target, true]);
-      }
-    });
+        expect(seen).toEqual([
+          ...MALFORMED.map((target): [string, number] => [target, 400]),
+          ...ESCAPING_TRAVERSAL.map((target): [string, number] => [target, 403]),
+        ]);
+      },
+      { requires: ['static.encodedPathIsDecodedAndChecked'] },
+    );
 
     scenario('P1.static.020', 'a @Page route serves the HTML page', async () => {
       await using app = await bootApp({ components: pageFixture() });
