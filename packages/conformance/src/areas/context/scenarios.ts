@@ -1,7 +1,7 @@
 import { expect } from 'bun:test';
 import { bootApp } from '../../boot.ts';
 import { area, scenario } from '../../scenario.ts';
-import { bodyFixture, invalidJsonFixture } from './fixtures/body.ts';
+import { bodyFixture, emptyBodyFixture, invalidJsonFixture } from './fixtures/body.ts';
 import {
   afterNextFixture,
   cookieSurfaceFixture,
@@ -10,6 +10,7 @@ import {
   responseSurfaceFixture,
   valueSurfaceFixture,
 } from './fixtures/surface.ts';
+import { rawExchange } from './raw.ts';
 
 const JSON_HEADERS = { 'content-type': 'application/json' };
 const LOOPBACK = /^(?:127\.\d+\.\d+\.\d+|::1|::ffff:127\.\d+\.\d+\.\d+)$/;
@@ -49,6 +50,22 @@ function multipart(): FormData {
 }
 
 const UPLOAD = { kind: 'file', name: 'a.txt', size: 9, type: 'text/plain;charset=utf-8', text: 'file-body' };
+
+const EMPTY_BODIES: [string, string[], string][] = [
+  [
+    'json, Content-Length 0',
+    ['POST /ctx-empty/body HTTP/1.1', 'Content-Type: application/json', 'Content-Length: 0'],
+    '',
+  ],
+  ['no content type, Content-Length 0', ['POST /ctx-empty/body HTTP/1.1', 'Content-Length: 0'], ''],
+  ['json, no Content-Length', ['POST /ctx-empty/body HTTP/1.1', 'Content-Type: application/json'], ''],
+  [
+    'json, whitespace only',
+    ['POST /ctx-empty/body HTTP/1.1', 'Content-Type: application/json', 'Content-Length: 4'],
+    ' \n\t ',
+  ],
+  ['GET without a body', ['GET /ctx-empty/body HTTP/1.1'], ''],
+];
 
 export function register(): void {
   area('context', () => {
@@ -126,6 +143,24 @@ export function register(): void {
       expect(response.status).toBe(200);
       expect(response.json()).toEqual({ middleware: { a: 1 }, handler: { a: 1 } });
     });
+
+    scenario(
+      'P1.context.008',
+      'getBody resolves {} for an empty body, with or without a content type or Content-Length',
+      async () => {
+        await using app = await bootApp({ components: emptyBodyFixture() });
+        const seen: [string, number, unknown][] = [];
+
+        for (const [label, head, body] of EMPTY_BODIES) {
+          const response = await rawExchange(app.port, head, body);
+
+          seen.push([label, response.status, response.status === 200 ? JSON.parse(response.body) : response.body]);
+        }
+
+        expect(seen).toEqual(EMPTY_BODIES.map(([label]) => [label, 200, { first: {}, second: {} }]));
+      },
+      { requires: ['context.emptyBodyIsEmptyObject'] },
+    );
 
     scenario('P1.context.010', 'getQuery returns a value, and an empty string for a present empty key', async () => {
       await using app = await bootApp({ components: querySurfaceFixture() });

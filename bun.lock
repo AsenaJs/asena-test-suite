@@ -6,8 +6,8 @@
       "name": "asena-test-suite",
       "devDependencies": {
         "@asenajs/asena": "^0.12.1",
-        "@asenajs/ergenecore": "^5.0.1",
-        "@asenajs/hono-adapter": "^5.0.2",
+        "@asenajs/ergenecore": "^5.0.2",
+        "@asenajs/hono-adapter": "^5.0.3",
         "@eslint/js": "^9.39.5",
         "@types/bun": "^1.4.4",
         "@types/node": "^24.19.2",
@@ -82,9 +82,9 @@
 
     "@asenajs/asena-redis": ["@asenajs/asena-redis@4.0.1", "", { "peerDependencies": { "@asenajs/asena": "^0.11.0 || ^0.12.0", "redis": "^5.12.1", "reflect-metadata": "^0.2.2", "typescript": "^5.9.3" } }, "sha512-Up1RIgRkJ5wmLi6tS/jtfaVjAtNfyMFrOMcbX278rfqrusv3Ko8cPKyNqN2fpKCJKGgCkmlIqfJAKC+3FAnxVQ=="],
 
-    "@asenajs/ergenecore": ["@asenajs/ergenecore@5.0.1", "", { "peerDependencies": { "@asenajs/asena": "^0.12.0", "typescript": "^5.9.3", "zod": "^4.3.6" } }, "sha512-17cw5Z2eGTdp0zKTtrXXkt5Uki6YQyiGD4kVT5FEi83CoRjRdQYwVMOxrG8kcn4cA9CleJipRaa7JONvJdgk/w=="],
+    "@asenajs/ergenecore": ["@asenajs/ergenecore@5.0.2", "", { "peerDependencies": { "@asenajs/asena": "^0.12.0", "typescript": "^5.9.3", "zod": "^4.3.6" } }, "sha512-9eE/wkhT3UnjrYxUtthjdvhiGLKrDDJDpBoCrqi9wAxVzCaMsfQ/X7UCM7s1dbl455Tm6d/rUWMGqe9sZDcI7g=="],
 
-    "@asenajs/hono-adapter": ["@asenajs/hono-adapter@5.0.2", "", { "dependencies": { "@hono/zod-validator": "^0.9.0" }, "peerDependencies": { "@asenajs/asena": "^0.12.0", "hono": ">=4.12.9", "typescript": "^5.8.2", "zod": "^4.3.6" } }, "sha512-nAkUfZTxYmVO2fYZ/nLsLN+z79mXA8UvHcTyNeVG2/47ARBfz62eUQ9k08X5HTxUb7qOQk3eNhmwlirMXErT4w=="],
+    "@asenajs/hono-adapter": ["@asenajs/hono-adapter@5.0.3", "", { "dependencies": { "@hono/zod-validator": "^0.9.0" }, "peerDependencies": { "@asenajs/asena": "^0.12.0", "hono": ">=4.12.9", "typescript": "^5.8.2", "zod": "^4.3.6" } }, "sha512-tqii2JGOw394EsNPArHsypqZKA3D3lLcoxPv8XWf++oepaqhyp2aJpKQDB10P58yEn+3BFcmAkQchZHp55JmVw=="],
 
     "@babel/runtime": ["@babel/runtime@7.29.10", "", {}, "sha512-NpugTzbKgGrNe45Ui32cN8vCFFMxVtP/9rtfwv0nP5FRDAjvYBxJcLVpYA9mr1jxP6cnIT7x9LUzuDTbWYYNRA=="],
 

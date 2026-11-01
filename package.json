@@ -23,8 +23,8 @@
   },
   "devDependencies": {
     "@asenajs/asena": "^0.12.1",
-    "@asenajs/ergenecore": "^5.0.1",
-    "@asenajs/hono-adapter": "^5.0.2",
+    "@asenajs/ergenecore": "^5.0.2",
+    "@asenajs/hono-adapter": "^5.0.3",
     "@eslint/js": "^9.39.5",
     "@types/bun": "^1.4.4",
     "@types/node": "^24.19.2",

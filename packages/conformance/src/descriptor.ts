@@ -36,10 +36,16 @@ export type DivergenceFlag =
   | 'routing.unmatchedRoutePatternUnset'
   | 'context.absentValuesMatchDeclaredTypes'
   | 'context.invalidJsonIsBadRequest'
+  | 'context.emptyBodyIsEmptyObject'
   | 'streaming.sseErrorCallbackOwnsOutput'
   | 'streaming.sseWriterStateIsLive'
   | 'static.overrideNotFoundContinuesToHandler'
-  | 'static.encodedPathIsDecodedAndChecked';
+  | 'static.encodedPathIsDecodedAndChecked'
+  | 'static.encodedSlashInRootIsServed'
+  | 'static.missKeepsRoutePattern'
+  | 'static.missDoesNotFallThrough'
+  | 'static.nulPathIsNotFound'
+  | 'routing.userRootWildcardAnswers';
 
 export type CapabilityFlag = OptionalFlag | DivergenceFlag;
 

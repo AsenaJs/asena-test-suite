@@ -280,6 +280,33 @@ export function register(): void {
       expect(text).toBe(`partial-ERROR:${STREAM_ERROR_MESSAGE}`);
     });
 
+    scenario('P1.streaming.024', 'the streamText error callback owns the output and text/plain is kept', async () => {
+      await using app = await bootApp({ components: streamingFixture().components });
+      const response = await open(app, '/streaming/text/error');
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get('content-type')).toContain('text/plain');
+
+      const { text } = await readChunks(response);
+
+      expect(text).toBe(`partial-ERROR:${STREAM_ERROR_MESSAGE}`);
+    });
+
+    scenario(
+      'P1.streaming.025',
+      'a silent stream or streamText error callback adds nothing to the output',
+      async () => {
+        await using app = await bootApp({ components: streamingFixture().components });
+
+        for (const path of ['/streaming/download/silent-error', '/streaming/text/silent-error']) {
+          const response = await open(app, path);
+          const { text } = await readChunks(response);
+
+          expect([path, response.status, text]).toEqual([path, 200, 'only']);
+        }
+      },
+    );
+
     scenario('P1.streaming.030', 'concurrent SSE and text streams stay complete and never interleave', async () => {
       await using app = await bootApp({ components: concurrencyFixture() });
       const sseTokens = Array.from({ length: CONCURRENT_STREAMS }, (_, i) => `sse${i}x`);

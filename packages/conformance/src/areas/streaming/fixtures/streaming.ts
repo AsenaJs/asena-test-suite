@@ -218,6 +218,41 @@ export function streamingFixture(): StreamingFixture {
         },
       );
     }
+
+    @Get('/download/silent-error')
+    public streamSilentError(context: AsenaContext<any, any>) {
+      return context.stream(
+        async (stream) => {
+          await stream.write('only');
+          throw new Error(STREAM_ERROR_MESSAGE);
+        },
+        async () => {},
+      );
+    }
+
+    @Get('/text/error')
+    public textError(context: AsenaContext<any, any>) {
+      return context.streamText(
+        async (stream) => {
+          await stream.write('partial-');
+          throw new Error(STREAM_ERROR_MESSAGE);
+        },
+        async (error, stream) => {
+          await stream.write(`ERROR:${error.message}`);
+        },
+      );
+    }
+
+    @Get('/text/silent-error')
+    public textSilentError(context: AsenaContext<any, any>) {
+      return context.streamText(
+        async (stream) => {
+          await stream.write('only');
+          throw new Error(STREAM_ERROR_MESSAGE);
+        },
+        async () => {},
+      );
+    }
   }
 
   return { components: [StreamingController], emptyFrame, progressive };

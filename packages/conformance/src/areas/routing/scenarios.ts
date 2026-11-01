@@ -10,6 +10,7 @@ import {
   notFoundFixture,
   paramsFixture,
   plainNotFoundFixture,
+  rootWildcardFixture,
   routePatternFixture,
   SINGLE_METHODS,
   staticBeforeParamFixture,
@@ -274,6 +275,30 @@ export function register(): void {
       expect(response.status).toBe(404);
       expect(response.json()).toEqual(NOT_FOUND);
     });
+
+    scenario(
+      'P1.routing.053',
+      'a user /* route on a root controller answers every path no other route owns',
+      async () => {
+        await using app = await bootApp({ components: rootWildcardFixture() });
+
+        for (const path of ['/elsewhere/x', '/rw/missing', '/a.txt']) {
+          const response = await app.get(path);
+
+          expect({ path, status: response.status, body: response.json() }).toEqual({
+            path,
+            status: 200,
+            body: { wildcard: path },
+          });
+        }
+
+        const owned = await app.get('/rw/here');
+
+        expect(owned.status).toBe(200);
+        expect(owned.json()).toEqual({ handler: 'here' });
+      },
+      { requires: ['routing.userRootWildcardAnswers'] },
+    );
 
     scenario(
       'P1.routing.060',

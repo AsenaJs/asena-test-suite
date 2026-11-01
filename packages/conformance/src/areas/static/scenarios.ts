@@ -9,8 +9,10 @@ import {
   PAGE_MARKER,
   pageFixture,
   SIBLING_SECRET,
+  spaStaticFixture,
   STATIC_ROOT,
   staticFixture,
+  staticMissFixture,
 } from './fixtures/components.ts';
 import { rawGet } from './raw.ts';
 
@@ -32,6 +34,10 @@ const ESCAPING_TRAVERSAL = [
 ];
 
 const MALFORMED = ['/static/%zz.txt', '/static/100%.txt', '/static/%e0%a4%a.txt'];
+
+const IN_ROOT_ENCODED_SLASH = ['/static/sub%2Ffile.txt', '/static/sub%2ffile.txt'];
+
+const NUL_PATHS = ['/static/a%00.txt', '/static/hello.txt%00'];
 
 function fileText(name: string): Promise<string> {
   return Bun.file(join(STATIC_ROOT, name)).text();
@@ -190,6 +196,179 @@ export function register(): void {
         ]);
       },
       { requires: ['static.encodedPathIsDecodedAndChecked'] },
+    );
+
+    scenario(
+      'P1.static.012',
+      'an encoded slash inside the root is decoded once and the file it names is served',
+      async () => {
+        const fixture = staticFixture();
+        await using app = await bootApp({ components: fixture.components });
+        const subFile = await fileText('sub/file.txt');
+        const seen: [string, number, string][] = [];
+
+        for (const target of IN_ROOT_ENCODED_SLASH) {
+          const response = await rawGet(app.port, target);
+
+          seen.push([target, response.status, response.body]);
+        }
+
+        expect(seen).toEqual(IN_ROOT_ENCODED_SLASH.map((target): [string, number, string] => [target, 200, subFile]));
+
+        const missing = await rawGet(app.port, '/static/sub%2Fmissing.txt');
+
+        expect(missing.status).toBe(404);
+        expect(JSON.parse(missing.body)).toEqual(NOT_FOUND);
+        expect(fixture.probe.rewrites).toEqual([
+          '/static/sub/file.txt',
+          '/static/sub/file.txt',
+          '/static/sub/missing.txt',
+        ]);
+        expect(fixture.probe.found.map((path) => path.endsWith('/sub/file.txt'))).toEqual([true, true]);
+        expect(fixture.probe.notFound.map((path) => path.endsWith('/sub/missing.txt'))).toEqual([true]);
+        expect(fixture.probe.handler).toBe(0);
+      },
+      { requires: ['static.encodedSlashInRootIsServed'] },
+    );
+
+    scenario(
+      'P1.static.013',
+      'on a static miss a global middleware and the config onNotFound read the static route pattern',
+      async () => {
+        const fixture = staticMissFixture();
+        await using app = await bootApp({ components: fixture.components });
+
+        const missing = await app.get('/site/assets/missing.txt');
+
+        expect(missing.status).toBe(404);
+        expect(missing.json()).toEqual({ notFound: true });
+        expect(fixture.probe.before).toEqual({ '/site/assets/missing.txt': '/site/assets/:file' });
+        expect(fixture.probe.notFound).toEqual({ '/site/assets/missing.txt': '/site/assets/:file' });
+
+        const present = await app.get('/site/assets/hello.txt');
+
+        expect(present.status).toBe(200);
+        expect(present.text()).toBe(await fileText('hello.txt'));
+        expect(fixture.probe.before['/site/assets/hello.txt']).toBe('/site/assets/:file');
+        expect(fixture.probe.handler).toBe(0);
+      },
+      { requires: ['optional.routePattern', 'optional.notFoundHook', 'static.missKeepsRoutePattern'] },
+    );
+
+    scenario(
+      'P1.static.014',
+      'a static miss ends in the config onNotFound and never falls through to a matching wildcard route',
+      async () => {
+        const fixture = staticMissFixture({ fallback: 'site' });
+        await using app = await bootApp({ components: fixture.components });
+
+        const missing = await app.get('/site/assets/missing.txt');
+
+        expect(missing.status).toBe(404);
+        expect(missing.json()).toEqual({ notFound: true });
+        expect(Object.keys(fixture.probe.notFound)).toEqual(['/site/assets/missing.txt']);
+        expect(fixture.probe.fallback).toEqual([]);
+
+        const present = await app.get('/site/assets/hello.txt');
+
+        expect(present.status).toBe(200);
+        expect(present.text()).toBe(await fileText('hello.txt'));
+
+        const outside = await app.get('/site/other');
+
+        expect(outside.status).toBe(200);
+        expect(outside.json()).toEqual({ fallback: true });
+        expect(fixture.probe.fallback).toEqual(['/site/other']);
+        expect(fixture.probe.handler).toBe(0);
+      },
+      { requires: ['optional.notFoundHook', 'static.missDoesNotFallThrough'] },
+    );
+
+    scenario(
+      'P1.static.015',
+      'a static path that decodes to a NUL byte ends as not found',
+      async () => {
+        const fixture = staticFixture();
+        await using app = await bootApp({ components: fixture.components });
+        const seen: [string, number, string][] = [];
+
+        for (const target of NUL_PATHS) {
+          const response = await rawGet(app.port, target);
+
+          seen.push([target, response.status, response.body]);
+        }
+
+        expect(seen).toEqual(
+          NUL_PATHS.map((target): [string, number, string] => [target, 404, JSON.stringify(NOT_FOUND)]),
+        );
+        expect(fixture.probe.notFound).toHaveLength(NUL_PATHS.length);
+        expect(fixture.probe.found).toEqual([]);
+        expect(fixture.probe.handler).toBe(0);
+      },
+      { requires: ['static.nulPathIsNotFound'] },
+    );
+
+    scenario(
+      'P1.static.016',
+      'a static /* route on a root controller serves existing files and runs its miss path',
+      async () => {
+        const fixture = spaStaticFixture();
+        await using app = await bootApp({ components: fixture.components });
+
+        const hello = await app.get('/hello.txt');
+
+        expect(hello.status).toBe(200);
+        expect(hello.text()).toBe(await fileText('hello.txt'));
+
+        const nested = await app.get('/sub/file.txt');
+
+        expect(nested.status).toBe(200);
+        expect(nested.text()).toBe(await fileText('sub/file.txt'));
+
+        const missing = await app.get('/missing.txt');
+
+        expect(missing.status).toBe(404);
+        expect(missing.json()).toEqual({ shaped: true });
+        expect(fixture.probe.rewrites).toEqual(['/hello.txt', '/sub/file.txt', '/missing.txt']);
+        expect(
+          fixture.probe.found.map((path) => path.endsWith('/hello.txt') || path.endsWith('/sub/file.txt')),
+        ).toEqual([true, true]);
+        expect(fixture.probe.notFound.map((path) => path.endsWith('/missing.txt'))).toEqual([true]);
+        expect(fixture.probe.configNotFound).toEqual(['/missing.txt']);
+        expect(fixture.probe.handler).toBe(0);
+      },
+      { requires: ['optional.notFoundHook', 'routing.userRootWildcardAnswers'] },
+    );
+
+    scenario(
+      'P1.static.017',
+      'a static miss never falls through to a top-level /* route, which still answers other paths',
+      async () => {
+        const fixture = staticMissFixture({ fallback: 'root' });
+        await using app = await bootApp({ components: fixture.components });
+
+        const missing = await app.get('/site/assets/missing.txt');
+
+        expect(missing.status).toBe(404);
+        expect(missing.json()).toEqual({ notFound: true });
+        expect(Object.keys(fixture.probe.notFound)).toEqual(['/site/assets/missing.txt']);
+        expect(fixture.probe.fallback).toEqual([]);
+
+        const present = await app.get('/site/assets/hello.txt');
+
+        expect(present.status).toBe(200);
+        expect(present.text()).toBe(await fileText('hello.txt'));
+
+        const outside = await app.get('/other');
+
+        expect(outside.status).toBe(200);
+        expect(outside.json()).toEqual({ fallback: true });
+        expect(fixture.probe.fallback).toEqual(['/other']);
+        expect(fixture.probe.handler).toBe(0);
+      },
+      {
+        requires: ['optional.notFoundHook', 'static.missDoesNotFallThrough', 'routing.userRootWildcardAnswers'],
+      },
     );
 
     scenario('P1.static.020', 'a @Page route serves the HTML page', async () => {

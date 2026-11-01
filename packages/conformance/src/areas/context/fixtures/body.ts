@@ -1,6 +1,6 @@
 import { type AsenaContext, type AsenaNextHandler, isHttpException } from '@asenajs/asena/adapter';
 import { Config, Controller, Middleware } from '@asenajs/asena/decorators';
-import { Post } from '@asenajs/asena/decorators/http';
+import { Get, Post } from '@asenajs/asena/decorators/http';
 import { AsenaMiddlewareService } from '@asenajs/asena/middleware';
 import type { AsenaConfig } from '@asenajs/asena/server/config';
 
@@ -78,6 +78,23 @@ export function bodyFixture(): Component[] {
   }
 
   return [ContextBodyController, ContextBodyPeekMiddleware];
+}
+
+export function emptyBodyFixture(): Component[] {
+  @Controller('/ctx-empty')
+  class ContextEmptyBodyController {
+    @Post('/body')
+    public async post(context: Context) {
+      return context.send({ first: await context.getBody(), second: await context.getBody() });
+    }
+
+    @Get('/body')
+    public async get(context: Context) {
+      return context.send({ first: await context.getBody(), second: await context.getBody() });
+    }
+  }
+
+  return [ContextEmptyBodyController];
 }
 
 export interface InvalidJsonFixture {
