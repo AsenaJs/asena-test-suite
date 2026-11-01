@@ -129,21 +129,16 @@ export function register(): void {
       expect(fixture.handlerCalls).toEqual([]);
     });
 
-    scenario(
-      'P1.errors.014',
-      'an error thrown in a middleware after next() reaches onError',
-      async () => {
-        const fixture = errorsFixture('answers');
-        await using app = await bootApp({ components: fixture.components });
-        const response = await app.get('/errors/mw-after');
+    scenario('P1.errors.014', 'an error thrown in a middleware after next() reaches onError', async () => {
+      const fixture = errorsFixture('answers');
+      await using app = await bootApp({ components: fixture.components });
+      const response = await app.get('/errors/mw-after');
 
-        expect(response.status).toBe(503);
-        expect(response.json()).toEqual({ handled: MW_AFTER });
-        expect(fixture.seen).toEqual([MW_AFTER]);
-        expect(fixture.handlerCalls).toEqual(['mw-after']);
-      },
-      { requires: ['middleware.codeAfterNextRuns'] },
-    );
+      expect(response.status).toBe(503);
+      expect(response.json()).toEqual({ handled: MW_AFTER });
+      expect(fixture.seen).toEqual([MW_AFTER]);
+      expect(fixture.handlerCalls).toEqual(['mw-after']);
+    });
 
     scenario('P1.errors.015', 'an onError that throws answers 500 and the server keeps serving', async () => {
       const fixture = errorsFixture('throws');

@@ -110,7 +110,9 @@ export function isOn(flag: CapabilityFlag): boolean {
   if (forced().has(flag)) return true;
   if (entry.kind === 'divergence') return !divergenceOff(flag as DivergenceFlag);
 
-  return getDescriptor().capabilities[flag as keyof AdapterDescriptor['capabilities']];
+  const declared: Readonly<Partial<Record<CapabilityFlag, boolean>>> = getDescriptor().capabilities;
+
+  return Boolean(declared[flag]);
 }
 
 export function hasMember(member: DescriptorMember): boolean {

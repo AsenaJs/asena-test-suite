@@ -119,7 +119,6 @@ export function register(): void {
         expect(fixture.emptyFrame.continuedAfterThrow).toBe(false);
         expect(events).toEqual([{ data: 'before' }, { event: 'error', data: (error as Error).message }]);
       },
-      { requires: ['streaming.sseErrorCallbackOwnsOutput'] },
     );
 
     scenario(
@@ -134,43 +133,37 @@ export function register(): void {
           { event: 'error', data: JSON.stringify({ error: SSE_ERROR_MESSAGE }) },
         ]);
       },
-      { requires: ['streaming.sseErrorCallbackOwnsOutput'] },
     );
 
-    scenario(
-      'P1.streaming.008',
-      'a client abort on a long-lived SSE fires onAbort on the server',
-      async () => {
-        await using app = await bootApp({ components: abortFixture() });
-        const probe = await app.resolve<AbortProbeState>(ABORT_PROBE);
-        const controller = new AbortController();
-        const response = await open(app, '/streaming-abort/sse/long-lived', { signal: controller.signal });
+    scenario('P1.streaming.008', 'a client abort on a long-lived SSE fires onAbort on the server', async () => {
+      await using app = await bootApp({ components: abortFixture() });
+      const probe = await app.resolve<AbortProbeState>(ABORT_PROBE);
+      const controller = new AbortController();
+      const response = await open(app, '/streaming-abort/sse/long-lived', { signal: controller.signal });
 
-        expect(response.status).toBe(200);
+      expect(response.status).toBe(200);
 
-        const events = readSse(response);
-        const first = await withTimeout(events.next(), 2000, 'first SSE event');
+      const events = readSse(response);
+      const first = await withTimeout(events.next(), 2000, 'first SSE event');
 
-        expect(first.value).toEqual({ event: 'status', data: 'connected' });
-        expect(probe.connected).toBe(1);
-        expect(probe.aborted).toBe(0);
+      expect(first.value).toEqual({ event: 'status', data: 'connected' });
+      expect(probe.connected).toBe(1);
+      expect(probe.aborted).toBe(0);
 
-        const abortedAt = performance.now();
+      const abortedAt = performance.now();
 
-        controller.abort();
-        await events.return(undefined).catch(() => undefined);
+      controller.abort();
+      await events.return(undefined).catch(() => undefined);
 
-        await waitFor(() => probe.aborted > 0, { timeout: 2000, label: 'server-side onAbort' });
+      await waitFor(() => probe.aborted > 0, { timeout: 2000, label: 'server-side onAbort' });
 
-        expect(probe.aborted).toBe(1);
-        expect(probe.abortedAt! - abortedAt < 2000).toBe(true);
+      expect(probe.aborted).toBe(1);
+      expect(probe.abortedAt! - abortedAt < 2000).toBe(true);
 
-        await waitFor(() => probe.finished, { timeout: 2000, label: 'long-lived handler returns after abort' });
+      await waitFor(() => probe.finished, { timeout: 2000, label: 'long-lived handler returns after abort' });
 
-        expect(probe.writerAborted).toBe(true);
-      },
-      { requires: ['streaming.sseWriterStateIsLive'] },
-    );
+      expect(probe.writerAborted).toBe(true);
+    });
 
     scenario('P1.streaming.010', 'streamText sets text/plain, nosniff and delivers the exact text', async () => {
       await using app = await bootApp({ components: streamingFixture().components });

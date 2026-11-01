@@ -29,23 +29,7 @@ export interface ConformanceRateLimiterOptions {
 }
 
 /** Maintainer bookkeeping for first-party adapters. Not part of AdapterDescriptor; not exported from the package index. */
-export type DivergenceFlag =
-  | 'routing.trailingSlashAlias'
-  | 'ws.startAwaitsTransportInit'
-  | 'middleware.codeAfterNextRuns'
-  | 'routing.unmatchedRoutePatternUnset'
-  | 'context.absentValuesMatchDeclaredTypes'
-  | 'context.invalidJsonIsBadRequest'
-  | 'context.emptyBodyIsEmptyObject'
-  | 'streaming.sseErrorCallbackOwnsOutput'
-  | 'streaming.sseWriterStateIsLive'
-  | 'static.overrideNotFoundContinuesToHandler'
-  | 'static.encodedPathIsDecodedAndChecked'
-  | 'static.encodedSlashInRootIsServed'
-  | 'static.missKeepsRoutePattern'
-  | 'static.missDoesNotFallThrough'
-  | 'static.nulPathIsNotFound'
-  | 'routing.userRootWildcardAnswers';
+export type DivergenceFlag = never;
 
 export type CapabilityFlag = OptionalFlag | DivergenceFlag;
 

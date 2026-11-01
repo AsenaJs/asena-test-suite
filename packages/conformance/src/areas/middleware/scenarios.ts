@@ -184,21 +184,16 @@ export function register(): void {
       expect(fixture.handlerRuns).toEqual([]);
     });
 
-    scenario(
-      'P1.middleware.022',
-      'a header a middleware adds after next() is on the response',
-      async () => {
-        const fixture = flowFixture();
-        await using app = await bootApp({ components: fixture.components });
-        const response = await app.get('/mw-flow/after');
+    scenario('P1.middleware.022', 'a header a middleware adds after next() is on the response', async () => {
+      const fixture = flowFixture();
+      await using app = await bootApp({ components: fixture.components });
+      const response = await app.get('/mw-flow/after');
 
-        expect(response.status).toBe(200);
-        expect(response.json()).toEqual({ reached: true });
-        expect(fixture.handlerRuns).toEqual(['after']);
-        expect(response.headers.get('x-after-next')).toBe('added');
-      },
-      { requires: ['middleware.codeAfterNextRuns'] },
-    );
+      expect(response.status).toBe(200);
+      expect(response.json()).toEqual({ reached: true });
+      expect(fixture.handlerRuns).toEqual(['after']);
+      expect(response.headers.get('x-after-next')).toBe('added');
+    });
 
     scenario(
       'P1.middleware.030',

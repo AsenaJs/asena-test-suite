@@ -12,22 +12,6 @@ export interface CapabilityEntry {
 }
 
 export const capabilities: Readonly<Record<CapabilityFlag, Readonly<CapabilityEntry>>> = Object.freeze({
-  'routing.trailingSlashAlias': { kind: 'divergence', convergence: 'WP-51' },
-  'ws.startAwaitsTransportInit': { kind: 'divergence', convergence: 'WP-50' },
-  'middleware.codeAfterNextRuns': { kind: 'divergence', convergence: 'WP-55' },
-  'routing.unmatchedRoutePatternUnset': { kind: 'divergence', convergence: 'WP-56' },
-  'context.absentValuesMatchDeclaredTypes': { kind: 'divergence', convergence: 'WP-57' },
-  'context.invalidJsonIsBadRequest': { kind: 'divergence', convergence: 'WP-58' },
-  'context.emptyBodyIsEmptyObject': { kind: 'divergence', convergence: 'WP-58' },
-  'streaming.sseErrorCallbackOwnsOutput': { kind: 'divergence', convergence: 'WP-59' },
-  'streaming.sseWriterStateIsLive': { kind: 'divergence', convergence: 'WP-60' },
-  'static.overrideNotFoundContinuesToHandler': { kind: 'divergence', convergence: 'WP-61' },
-  'static.encodedPathIsDecodedAndChecked': { kind: 'divergence', convergence: 'WP-62' },
-  'static.encodedSlashInRootIsServed': { kind: 'divergence', convergence: 'WP-62' },
-  'static.missKeepsRoutePattern': { kind: 'divergence', convergence: 'WP-56' },
-  'static.missDoesNotFallThrough': { kind: 'divergence', convergence: 'WP-63' },
-  'static.nulPathIsNotFound': { kind: 'divergence', convergence: 'WP-64' },
-  'routing.userRootWildcardAnswers': { kind: 'divergence', convergence: 'WP-65' },
   'optional.notFoundHook': {
     kind: 'optional',
     description: 'AsenaAdapter.onNotFound is optional; without it a config onNotFound hook is never called.',
