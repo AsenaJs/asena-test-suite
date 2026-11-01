@@ -36,6 +36,7 @@ export type DivergenceFlag =
   | 'routing.unmatchedRoutePatternUnset'
   | 'context.absentValuesMatchDeclaredTypes'
   | 'context.invalidJsonIsBadRequest'
+  | 'context.emptyBodyIsEmptyObject'
   | 'streaming.sseErrorCallbackOwnsOutput'
   | 'streaming.sseWriterStateIsLive'
   | 'static.overrideNotFoundContinuesToHandler'

@@ -43,6 +43,7 @@ export const divergences: Partial<Record<DivergenceFlag, false>> = {
   'routing.unmatchedRoutePatternUnset': false,
   'context.absentValuesMatchDeclaredTypes': false,
   'context.invalidJsonIsBadRequest': false,
+  'context.emptyBodyIsEmptyObject': false,
   'streaming.sseErrorCallbackOwnsOutput': false,
   'streaming.sseWriterStateIsLive': false,
   'static.overrideNotFoundContinuesToHandler': false,

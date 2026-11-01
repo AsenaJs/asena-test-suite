@@ -18,6 +18,7 @@ export const capabilities: Readonly<Record<CapabilityFlag, Readonly<CapabilityEn
   'routing.unmatchedRoutePatternUnset': { kind: 'divergence', convergence: 'WP-56' },
   'context.absentValuesMatchDeclaredTypes': { kind: 'divergence', convergence: 'WP-57' },
   'context.invalidJsonIsBadRequest': { kind: 'divergence', convergence: 'WP-58' },
+  'context.emptyBodyIsEmptyObject': { kind: 'divergence', convergence: 'WP-58' },
   'streaming.sseErrorCallbackOwnsOutput': { kind: 'divergence', convergence: 'WP-59' },
   'streaming.sseWriterStateIsLive': { kind: 'divergence', convergence: 'WP-60' },
   'static.overrideNotFoundContinuesToHandler': { kind: 'divergence', convergence: 'WP-61' },
