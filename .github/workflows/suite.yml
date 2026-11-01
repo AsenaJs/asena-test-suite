@@ -1,0 +1,238 @@
+name: Suite
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+    inputs:
+      resolution:
+        description: 'published = npm releases; local = pack the sibling repos at the refs below'
+        type: choice
+        options: [published, local]
+        default: published
+      asena-ref:
+        description: 'Asena ref for the local leg (empty = default branch)'
+        type: string
+        default: ''
+      ergenecore-ref:
+        description: 'ergenecore ref for the local leg (empty = default branch)'
+        type: string
+        default: ''
+      hono-adapter-ref:
+        description: 'hono-adapter ref for the local leg (empty = default branch)'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+env:
+  BUN_VERSION: 1.4.4
+
+defaults:
+  run:
+    working-directory: asena-test-suite
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ASENA_SUITE_WORKSPACE: ''
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: asena-test-suite
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+
+      - name: Lint + format
+        run: bun run check
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Validate (checks 1-5 and the packed leg, npm variant)
+        run: bun run validate
+
+      - name: Upload junit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-validate
+          path: asena-test-suite/out/**/*.xml
+          if-no-files-found: ignore
+
+  conformance:
+    name: conformance (${{ matrix.adapter }}, ${{ matrix.resolution }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter: [ergenecore, hono]
+        resolution: ${{ github.event_name == 'schedule' && fromJSON('["published","local"]') || fromJSON(format('["{0}"]', inputs.resolution || 'published')) }}
+    env:
+      ASENA_ADAPTER: ${{ matrix.adapter }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: asena-test-suite
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Check out sibling repos
+        if: matrix.resolution == 'local'
+        env:
+          ASENA_REF: ${{ inputs.asena-ref }}
+          ERGENECORE_REF: ${{ inputs.ergenecore-ref }}
+          HONO_ADAPTER_REF: ${{ inputs.hono-adapter-ref }}
+        run: |
+          for spec in "Asena=$ASENA_REF" "ergenecore=$ERGENECORE_REF" "hono-adapter=$HONO_ADAPTER_REF"; do
+            repo="${spec%%=*}"
+            ref="${spec#*=}"
+            git clone --quiet "https://github.com/AsenaJs/${repo}.git" "../${repo}"
+            if [ -n "$ref" ]; then git -C "../${repo}" checkout --quiet --detach "$ref"; fi
+          done
+
+      - name: Pack local
+        if: matrix.resolution == 'local'
+        run: |
+          bun run pack:local -- --workspace "$GITHUB_WORKSPACE" --ref Asena=HEAD --ref ergenecore=HEAD --ref hono-adapter=HEAD | tee pack-local.txt
+          { echo '### pack:local'; echo '```'; cat pack-local.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Part 1
+        run: bun run test:p1 --reporter=junit --reporter-outfile="$PWD/out/p1-${{ matrix.adapter }}.xml"
+
+      - name: Upload junit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-p1-${{ matrix.adapter }}-${{ matrix.resolution }}
+          path: asena-test-suite/out/*.xml
+          if-no-files-found: ignore
+
+  ecosystem:
+    name: ecosystem (${{ matrix.adapter }}, ${{ matrix.resolution }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        adapter: [ergenecore, hono]
+        resolution: ${{ github.event_name == 'schedule' && fromJSON('["published","local"]') || fromJSON(format('["{0}"]', inputs.resolution || 'published')) }}
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+      kafka:
+        image: apache/kafka:3.9.1
+        ports:
+          - 9092:9092
+        env:
+          KAFKA_NODE_ID: 1
+          KAFKA_PROCESS_ROLES: broker,controller
+          KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+          KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+          KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+          KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+          KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+          KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+          KAFKA_GROUP_MIN_SESSION_TIMEOUT_MS: 1000
+          KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+        options: >-
+          --health-cmd "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092"
+          --health-interval 5s
+          --health-timeout 20s
+          --health-start-period 30s
+          --health-retries 30
+      postgres:
+        image: postgres:17-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: asena
+          POSTGRES_PASSWORD: asena
+          POSTGRES_DB: asena_suite
+        options: >-
+          --health-cmd "pg_isready -U asena -d asena_suite"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      ASENA_ADAPTER: ${{ matrix.adapter }}
+      ASENA_SUITE_REDIS_URL: redis://localhost:6379
+      ASENA_SUITE_POSTGRES_URL: postgres://asena:asena@localhost:5432/asena_suite
+      ASENA_SUITE_KAFKA_BROKERS: localhost:9092
+      ASENA_SUITE_REQUIRE_SERVICES: '1'
+      ASENA_SUITE_MIXED: ergenecore,hono
+      ASENA_SUITE_SLOW: '1'
+      ASENA_SUITE_KAFKA_RESTART_CMD: docker restart ${{ job.services.kafka.id }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: asena-test-suite
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Check out sibling repos
+        if: matrix.resolution == 'local'
+        env:
+          ASENA_REF: ${{ inputs.asena-ref }}
+          ERGENECORE_REF: ${{ inputs.ergenecore-ref }}
+          HONO_ADAPTER_REF: ${{ inputs.hono-adapter-ref }}
+        run: |
+          for spec in "Asena=$ASENA_REF" "ergenecore=$ERGENECORE_REF" "hono-adapter=$HONO_ADAPTER_REF"; do
+            repo="${spec%%=*}"
+            ref="${spec#*=}"
+            git clone --quiet "https://github.com/AsenaJs/${repo}.git" "../${repo}"
+            if [ -n "$ref" ]; then git -C "../${repo}" checkout --quiet --detach "$ref"; fi
+          done
+
+      - name: Pack local
+        if: matrix.resolution == 'local'
+        run: |
+          bun run pack:local -- --workspace "$GITHUB_WORKSPACE" --ref Asena=HEAD --ref ergenecore=HEAD --ref hono-adapter=HEAD | tee pack-local.txt
+          { echo '### pack:local'; echo '```'; cat pack-local.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Part 2
+        run: bun run test:p2 --reporter=junit --out "out/p2-${{ matrix.adapter }}.xml"
+
+      - name: Upload junit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-p2-${{ matrix.adapter }}-${{ matrix.resolution }}
+          path: asena-test-suite/out/*.xml
+          if-no-files-found: ignore

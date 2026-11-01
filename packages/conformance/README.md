@@ -207,6 +207,30 @@ typecheck under `strict`.
 `readChunks`, `waitFor`, `withTimeout`, `bootApps`, `recordCalls`, `randomPort`, `isPortFree`, `TestSocket`). They are
 optional for your own tests.
 
+## Running in CI
+
+The suite repository ships a reusable GitHub Actions workflow, `.github/workflows/conformance-reusable.yml`. It checks out your
+repository (the adapter is the root project), runs `bun install`, `bun run build` when a `build` script exists, adds
+`@asenajs/adapter-conformance` (and `zod` when `with-zod` is true) as a dev dependency, runs `bun test <entry-path>
+--reporter=junit` and uploads the junit report. A minimal caller:
+
+```yaml
+name: Conformance
+on: [pull_request]
+jobs:
+  conformance:
+    uses: AsenaJs/asena-test-suite/.github/workflows/conformance-reusable.yml@main
+    with:
+      entry-path: test/conformance.test.ts
+      with-zod: true
+```
+
+Inputs: `entry-path` (required, your `runConformance` file), `with-zod` (default `false`; set it when your descriptor declares
+`optional.zodValidator: true`), `conformance-version` (default `latest`) and `bun-version` (default `1.4.4`). The job is red when any
+scenario fails. A red `P1.resolution.010` means the descriptor you pass to `runConformance` is not a third-party descriptor:
+it carries a `divergences` property, a capability key that is not an optional flag, or another unknown key (see "Reading the
+verdict"). Remove the key; the job stays red until it is.
+
 ## License
 
 MIT
