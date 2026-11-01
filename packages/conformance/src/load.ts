@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { capabilities, divergenceFlags, optionalFlags } from './capabilities.ts';
 import type { AdapterDescriptor, CapabilityFlag, DescriptorMember, DivergenceFlag } from './descriptor.ts';
@@ -138,35 +138,43 @@ export function runTag(): string {
   return sanitised || 'adapter';
 }
 
+function walkUp(start: string, probe: (dir: string) => string | undefined): string | undefined {
+  for (let dir = start; ; dir = dirname(dir)) {
+    const found = probe(dir);
+
+    if (found) return found;
+    if (dirname(dir) === dir) return undefined;
+  }
+}
+
 export function adapterPackageRoot(): string {
   const descriptor = getDescriptor();
 
   if (descriptor.packageRoot) return descriptor.packageRoot;
 
-  try {
-    return dirname(Bun.resolveSync(`${descriptor.packageName}/package.json`, process.cwd()));
-  } catch {
-    let dir = process.cwd();
+  const installed = walkUp(process.cwd(), (dir) => {
+    const candidate = join(dir, 'node_modules', descriptor.packageName);
 
-    for (;;) {
-      const manifest = join(dir, 'package.json');
+    return existsSync(join(candidate, 'package.json')) ? realpathSync(candidate) : undefined;
+  });
 
-      if (existsSync(manifest)) {
-        try {
-          const parsed = JSON.parse(readFileSync(manifest, 'utf8')) as { name?: unknown };
+  if (installed) return installed;
 
-          if (parsed.name === descriptor.packageName) return dir;
-        } catch {
-          // An unreadable manifest is not the adapter's; keep walking up.
-        }
-      }
+  const self = walkUp(process.cwd(), (dir) => {
+    const manifest = join(dir, 'package.json');
 
-      const parent = dirname(dir);
+    if (!existsSync(manifest)) return undefined;
 
-      if (parent === dir) break;
-      dir = parent;
+    try {
+      const parsed = JSON.parse(readFileSync(manifest, 'utf8')) as { name?: unknown };
+
+      return parsed.name === descriptor.packageName ? dir : undefined;
+    } catch {
+      return undefined;
     }
-  }
+  });
+
+  if (self) return self;
 
   throw new Error(
     `Cannot locate the adapter package '${descriptor.packageName}' from ${process.cwd()}. ` +
