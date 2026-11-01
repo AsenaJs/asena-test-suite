@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="179" assertions="888" failures="0" skipped="0" time="254.950454519">
+  <testsuite name="test/00-resolution.test.ts" file="test/00-resolution.test.ts" tests="2" assertions="3" failures="0" skipped="0" time="0.050720049" hostname="Duffy">
+    <testcase name="[P2.resolution.001] every ecosystem package and the adapter resolve the same @asenajs/asena" classname="" time="0.000472" file="test/00-resolution.test.ts" line="112" assertions="1" />
+    <testcase name="[P2.resolution.002] @PostConstruct runs on a component injecting an asena-logger service" classname="" time="0.008097" file="test/00-resolution.test.ts" line="112" assertions="2" />
+  </testsuite>
+  <testsuite name="test/services.test.ts" file="test/services.test.ts" tests="8" assertions="27" failures="0" skipped="0" time="0.074909903" hostname="Duffy">
+    <testcase name="[P2.services.001] serviceConfig reads the three service variables and require mode" classname="" time="0.000037" file="test/services.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.services.002] endpoints come from the URL or broker list with default ports" classname="" time="0.000045" file="test/services.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.services.003] skip mode: an unreachable service is unset with a reason and reported false" classname="" time="0.000178" file="test/services.test.ts" line="112" assertions="5" />
+    <testcase name="[P2.services.004] require mode: an unreachable or unset service throws" classname="" time="0.000125" file="test/services.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.services.005] a reachable service is reported true and stays set" classname="" time="0.000107" file="test/services.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.services.006] the run namespace is per process and safe as a schema, key and topic prefix" classname="" time="0.000282" file="test/services.test.ts" line="112" assertions="5" />
+    <testcase name="[P2.services.007] a tracked Redis prefix is removed by cleanupNamespace and other keys survive" classname="" time="0.043344" file="test/services.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.services.008] a created Postgres schema is the search_path of its URL and is dropped by cleanupNamespace" classname="" time="0.029547" file="test/services.test.ts" line="112" assertions="3" />
+  </testsuite>
+  <testsuite name="modules/cli/cli.test.ts" file="modules/cli/cli.test.ts" tests="3" assertions="9" failures="0" skipped="0" time="2.403921219" hostname="Duffy">
+    <testcase name="[P2.cli.001] asena create --adapter=&lt;cliTemplate&gt; writes a project with both decorator flags" classname="" time="0.042944" file="modules/cli/cli.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.cli.002] the generated project installs on the suite core, boots from source and answers its route" classname="" time="2.161369" file="modules/cli/cli.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.cli.003] asena build output boots and answers the same route (decorator metadata survives bundling)" classname="" time="0.155692" file="modules/cli/cli.test.ts" line="112" assertions="3" />
+  </testsuite>
+  <testsuite name="modules/core/core.test.ts" file="modules/core/core.test.ts" tests="12" assertions="39" failures="0" skipped="0" time="31.596403345" hostname="Duffy">
+    <testcase name="[P2.core.001] an event emitted from an HTTP handler reaches its @On handler" classname="" time="0.008208" file="modules/core/core.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.core.002] an event nobody handles reports matched false and logs nothing" classname="" time="0.002118" file="modules/core/core.test.ts" line="112" assertions="5" />
+    <testcase name="[P2.core.003] an inherited @On and an own @On both join the subclass prefix" classname="" time="0.002016" file="modules/core/core.test.ts" line="112" assertions="5" />
+    <testcase name="[P2.core.010] @Schedule jobs register under the concrete subclass name, never the base" classname="" time="0.00413" file="modules/core/core.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.core.011] a scheduled job really executes once its minute comes" classname="" time="31.540381" file="modules/core/core.test.ts" line="112" assertions="1" />
+    <testcase name="[P2.core.020] the health server answers ready while serving and 503 during shutdown" classname="" time="0.00429" file="modules/core/core.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.core.021] an @OnStop hook runs after the adapter stopped and before the transport is destroyed" classname="" time="0.00224" file="modules/core/core.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.core.030] an inherited route and an own route on the same path refuse to boot" classname="" time="0.000793" file="modules/core/core.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.core.031] two controllers extending one route-carrying base under one prefix refuse to boot" classname="" time="0.000596" file="modules/core/core.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.core.032] overriding the inherited route method by name boots and serves the override" classname="" time="0.001388" file="modules/core/core.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.core.040] a plain subclass of a @Service is not registered and the warning names both classes" classname="" time="0.001299" file="modules/core/core.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.core.041] a plain subclass of a @Schedule is not a job and the warning names both classes" classname="" time="0.00143" file="modules/core/core.test.ts" line="112" assertions="4" />
+  </testsuite>
+  <testsuite name="modules/drizzle/drizzle.test.ts" file="modules/drizzle/drizzle.test.ts" tests="18" assertions="58" failures="0" skipped="0" time="0.334848228" hostname="Duffy">
+    <testcase name="[P2.drizzle.001] create returns 201 with the stored row" classname="" time="0.02418" file="modules/drizzle/drizzle.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.drizzle.002] findById returns the created row" classname="" time="0.012743" file="modules/drizzle/drizzle.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.drizzle.003] an unknown id answers 404 from the handler" classname="" time="0.010353" file="modules/drizzle/drizzle.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.drizzle.004] paginate splits 15 rows into pages of 5 in order" classname="" time="0.012959" file="modules/drizzle/drizzle.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.drizzle.005] search by email finds the row and answers 404 for an unknown email" classname="" time="0.01403" file="modules/drizzle/drizzle.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.drizzle.006] count reflects the stored rows" classname="" time="0.015246" file="modules/drizzle/drizzle.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.drizzle.007] bulk create stores every row and returns them" classname="" time="0.011808" file="modules/drizzle/drizzle.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.drizzle.008] a unique violation is mapped to exactly 409 by the config onError" classname="" time="0.012421" file="modules/drizzle/drizzle.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.drizzle.020] @Transaction REQUIRED commits every write" classname="" time="0.011869" file="modules/drizzle/drizzle.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.drizzle.021] @Transaction REQUIRED rolls every write back when the method throws" classname="" time="0.008626" file="modules/drizzle/drizzle.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.drizzle.022] NESTED rolls back to its savepoint alone, and is discarded with its outer transaction" classname="" time="0.013948" file="modules/drizzle/drizzle.test.ts" line="112" assertions="5" />
+    <testcase name="[P2.drizzle.023] REQUIRES_NEW commits independently and survives the outer rollback" classname="" time="0.013672" file="modules/drizzle/drizzle.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.drizzle.024] the isolation level is applied inside the transaction" classname="" time="0.01114" file="modules/drizzle/drizzle.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.drizzle.025] a read-only transaction rejects a write" classname="" time="0.008995" file="modules/drizzle/drizzle.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.drizzle.026] the programmatic transaction API commits and rolls back" classname="" time="0.011899" file="modules/drizzle/drizzle.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.drizzle.027] @Transaction inherited from an undecorated base class commits and rolls back" classname="" time="0.011716" file="modules/drizzle/drizzle.test.ts" line="112" assertions="5" />
+    <testcase name="[P2.drizzle.030] 20 concurrent requests keep their own transactions: exactly the successful rows persist" classname="" time="0.02661" file="modules/drizzle/drizzle.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.drizzle.031] the transaction context survives a global middleware that awaits before next()" classname="" time="0.012988" file="modules/drizzle/drizzle.test.ts" line="112" assertions="4" />
+  </testsuite>
+  <testsuite name="modules/logger/logger.test.ts" file="modules/logger/logger.test.ts" tests="4" assertions="14" failures="0" skipped="0" time="0.060301154" hostname="Duffy">
+    <testcase name="[P2.logger.001] an AsenaLogger passed to the app receives the route table and the startup line" classname="" time="0.011599" file="modules/logger/logger.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.logger.002] a handler error is logged exactly once with its message" classname="" time="0.002626" file="modules/logger/logger.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.logger.003] the adapter does not write to the console during boot and a failing request" classname="" time="0.002244" file="modules/logger/logger.test.ts" line="112" assertions="6" />
+    <testcase name="[P2.logger.004] an AsenaLogger service is injected into another service of an adapter-booted app" classname="" time="0.002042" file="modules/logger/logger.test.ts" line="112" assertions="3" />
+  </testsuite>
+  <testsuite name="modules/microservice/test/contract.kafka.test.ts" file="modules/microservice/test/contract.kafka.test.ts" tests="12" assertions="37" failures="0" skipped="0" time="14.73335418" hostname="Duffy">
+    <testsuite name="transport contract [kafka]" file="modules/microservice/test/contract.kafka.test.ts" line="116" tests="12" assertions="37" failures="0" skipped="0" time="7.85" hostname="Duffy">
+      <testcase name="[P2.microservice.contract.kafka.C01] full booking lifecycle over HTTP (create/get/cancel)" classname="transport contract [kafka]" time="0.051376" file="modules/microservice/test/contract.kafka.test.ts" line="112" assertions="9" />
+      <testcase name="[P2.microservice.contract.kafka.C02] RPC errors surface faithfully and are final (no retry)" classname="transport contract [kafka]" time="0.015605" file="modules/microservice/test/contract.kafka.test.ts" line="112" assertions="7" />
+      <testcase name="[P2.microservice.contract.kafka.C03] the caller timeout fires on the caller side" classname="transport contract [kafka]" time="1.00219" file="modules/microservice/test/contract.kafka.test.ts" line="112" assertions="3" />
+      <testcase name="[P2.microservice.contract.kafka.C04] event fan-out, wildcard selectivity and one messageId per emit" classname="transport contract [kafka]" time="2.820256" file="modules/microservice/test/contract.kafka.test.ts" line="112" assertions="3" />
+      <testcase name="[P2.microservice.contract.kafka.C05] an event chain (emit inside a handler) completes: created -&gt; reserved -&gt; confirmed" classname="transport contract [kafka]" time="0.006082" file="modules/microservice/test/contract.kafka.test.ts" line="112" assertions="0" />
+      <testcase name="[P2.microservice.contract.kafka.C06] a concurrent burst has no loss, no duplicates and no reply cross-talk" classname="transport contract [kafka]" time="0.035603" file="modules/microservice/test/contract.kafka.test.ts" line="112" assertions="4" />
+      <testcase name="[P2.microservice.contract.kafka.C07] an unknown pattern behaves as the transport declares" classname="transport contract [kafka]" time="3.802102" file="modules/microservice/test/contract.kafka.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.kafka.C08] messageId dedup accounting (at-least-once -&gt; exactly-once view)" classname="transport contract [kafka]" time="0.008558" file="modules/microservice/test/contract.kafka.test.ts" line="112" assertions="1" />
+      <testcase name="[P2.microservice.contract.kafka.C09] clientRef idempotency: the same ref never creates twice" classname="transport contract [kafka]" time="0.006739" file="modules/microservice/test/contract.kafka.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.kafka.C10] edge validation stays at the edge (no transport involved)" classname="transport contract [kafka]" time="0.001539" file="modules/microservice/test/contract.kafka.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.kafka.C11] a service with an invalid final pattern fails to boot loudly" classname="transport contract [kafka]" time="0.096086" file="modules/microservice/test/contract.kafka.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.kafka.C12] send/emit headers propagate byte-identical into context.headers" classname="transport contract [kafka]" time="0.008217" file="modules/microservice/test/contract.kafka.test.ts" line="112" assertions="2" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="modules/microservice/test/contract.memory.test.ts" file="modules/microservice/test/contract.memory.test.ts" tests="13" assertions="39" failures="0" skipped="0" time="1.262457842" hostname="Duffy">
+    <testsuite name="transport contract [memory]" file="modules/microservice/test/contract.memory.test.ts" line="116" tests="13" assertions="39" failures="0" skipped="0" time="1.154" hostname="Duffy">
+      <testcase name="[P2.microservice.contract.memory.C01] full booking lifecycle over HTTP (create/get/cancel)" classname="transport contract [memory]" time="0.001893" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="9" />
+      <testcase name="[P2.microservice.contract.memory.C02] RPC errors surface faithfully and are final (no retry)" classname="transport contract [memory]" time="0.000532" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="7" />
+      <testcase name="[P2.microservice.contract.memory.C03] the caller timeout fires on the caller side" classname="transport contract [memory]" time="1.000587" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="3" />
+      <testcase name="[P2.microservice.contract.memory.C04] event fan-out, wildcard selectivity and one messageId per emit" classname="transport contract [memory]" time="0.15092" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="3" />
+      <testcase name="[P2.microservice.contract.memory.C05] an event chain (emit inside a handler) completes: created -&gt; reserved -&gt; confirmed" classname="transport contract [memory]" time="0.000531" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="0" />
+      <testcase name="[P2.microservice.contract.memory.C06] a concurrent burst has no loss, no duplicates and no reply cross-talk" classname="transport contract [memory]" time="0.002728" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="4" />
+      <testcase name="[P2.microservice.contract.memory.C07] an unknown pattern behaves as the transport declares" classname="transport contract [memory]" time="0.000168" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.memory.C08] messageId dedup accounting (at-least-once -&gt; exactly-once view)" classname="transport contract [memory]" time="0.000127" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.memory.C09] clientRef idempotency: the same ref never creates twice" classname="transport contract [memory]" time="0.000168" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.memory.C10] edge validation stays at the edge (no transport involved)" classname="transport contract [memory]" time="0.000086" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.memory.C11] a service with an invalid final pattern fails to boot loudly" classname="transport contract [memory]" time="0.001353" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.memory.C12] send/emit headers propagate byte-identical into context.headers" classname="transport contract [memory]" time="0.000189" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.memory.C13] events for one consumer arrive in publish order" classname="transport contract [memory]" time="0.000178" file="modules/microservice/test/contract.memory.test.ts" line="112" assertions="1" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="modules/microservice/test/contract.redis.test.ts" file="modules/microservice/test/contract.redis.test.ts" tests="12" assertions="37" failures="0" skipped="0" time="3.934729902" hostname="Duffy">
+    <testsuite name="transport contract [redis]" file="modules/microservice/test/contract.redis.test.ts" line="116" tests="12" assertions="37" failures="0" skipped="0" time="3.12" hostname="Duffy">
+      <testcase name="[P2.microservice.contract.redis.C01] full booking lifecycle over HTTP (create/get/cancel)" classname="transport contract [redis]" time="0.003673" file="modules/microservice/test/contract.redis.test.ts" line="112" assertions="9" />
+      <testcase name="[P2.microservice.contract.redis.C02] RPC errors surface faithfully and are final (no retry)" classname="transport contract [redis]" time="0.001827" file="modules/microservice/test/contract.redis.test.ts" line="112" assertions="7" />
+      <testcase name="[P2.microservice.contract.redis.C03] the caller timeout fires on the caller side" classname="transport contract [redis]" time="1.001968" file="modules/microservice/test/contract.redis.test.ts" line="112" assertions="3" />
+      <testcase name="[P2.microservice.contract.redis.C04] event fan-out, wildcard selectivity and one messageId per emit" classname="transport contract [redis]" time="0.403467" file="modules/microservice/test/contract.redis.test.ts" line="112" assertions="3" />
+      <testcase name="[P2.microservice.contract.redis.C05] an event chain (emit inside a handler) completes: created -&gt; reserved -&gt; confirmed" classname="transport contract [redis]" time="0.001081" file="modules/microservice/test/contract.redis.test.ts" line="112" assertions="0" />
+      <testcase name="[P2.microservice.contract.redis.C06] a concurrent burst has no loss, no duplicates and no reply cross-talk" classname="transport contract [redis]" time="0.004174" file="modules/microservice/test/contract.redis.test.ts" line="112" assertions="4" />
+      <testcase name="[P2.microservice.contract.redis.C07] an unknown pattern behaves as the transport declares" classname="transport contract [redis]" time="1.601077" file="modules/microservice/test/contract.redis.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.redis.C08] messageId dedup accounting (at-least-once -&gt; exactly-once view)" classname="transport contract [redis]" time="0.00129" file="modules/microservice/test/contract.redis.test.ts" line="112" assertions="1" />
+      <testcase name="[P2.microservice.contract.redis.C09] clientRef idempotency: the same ref never creates twice" classname="transport contract [redis]" time="0.001179" file="modules/microservice/test/contract.redis.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.redis.C10] edge validation stays at the edge (no transport involved)" classname="transport contract [redis]" time="0.000251" file="modules/microservice/test/contract.redis.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.redis.C11] a service with an invalid final pattern fails to boot loudly" classname="transport contract [redis]" time="0.10367" file="modules/microservice/test/contract.redis.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.contract.redis.C12] send/emit headers propagate byte-identical into context.headers" classname="transport contract [redis]" time="0.001113" file="modules/microservice/test/contract.redis.test.ts" line="112" assertions="2" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="modules/microservice/test/inheritance.kafka.test.ts" file="modules/microservice/test/inheritance.kafka.test.ts" tests="7" assertions="12" failures="0" skipped="0" time="8.662536612" hostname="Duffy">
+    <testsuite name="message controller inheritance [kafka]" file="modules/microservice/test/inheritance.kafka.test.ts" line="116" tests="7" assertions="12" failures="0" skipped="0" time="4.733" hostname="Duffy">
+      <testcase name="[P2.microservice.inheritance.kafka.I01] a @MessagePattern declared on the base class answers over the transport" classname="message controller inheritance [kafka]" time="0.019925" file="modules/microservice/test/inheritance.kafka.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.inheritance.kafka.I02] an inherited @EventPattern opens a real subscription" classname="message controller inheritance [kafka]" time="0.004688" file="modules/microservice/test/inheritance.kafka.test.ts" line="112" assertions="0" />
+      <testcase name="[P2.microservice.inheritance.kafka.I03] base and subclass handlers both receive one emit (fan-out inside one controller)" classname="message controller inheritance [kafka]" time="0.003814" file="modules/microservice/test/inheritance.kafka.test.ts" line="112" assertions="1" />
+      <testcase name="[P2.microservice.inheritance.kafka.I04] the inherited exact subscription stays selective" classname="message controller inheritance [kafka]" time="0.805874" file="modules/microservice/test/inheritance.kafka.test.ts" line="112" assertions="1" />
+      <testcase name="[P2.microservice.inheritance.kafka.I05] a redelivery is still one logical event for each handler" classname="message controller inheritance [kafka]" time="0.805886" file="modules/microservice/test/inheritance.kafka.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.inheritance.kafka.I06] two @MessagePattern handlers resolving to one pattern fail to boot" classname="message controller inheritance [kafka]" time="0.096141" file="modules/microservice/test/inheritance.kafka.test.ts" line="112" assertions="5" />
+      <testcase name="[P2.microservice.inheritance.kafka.I07] an unknown handler on the inheriting controller is still unknown" classname="message controller inheritance [kafka]" time="3.00194" file="modules/microservice/test/inheritance.kafka.test.ts" line="112" assertions="1" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="modules/microservice/test/inheritance.memory.test.ts" file="modules/microservice/test/inheritance.memory.test.ts" tests="7" assertions="12" failures="0" skipped="0" time="0.399631068" hostname="Duffy">
+    <testsuite name="message controller inheritance [memory]" file="modules/microservice/test/inheritance.memory.test.ts" line="116" tests="7" assertions="12" failures="0" skipped="0" time="0.301" hostname="Duffy">
+      <testcase name="[P2.microservice.inheritance.memory.I01] a @MessagePattern declared on the base class answers over the transport" classname="message controller inheritance [memory]" time="0.000261" file="modules/microservice/test/inheritance.memory.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.inheritance.memory.I02] an inherited @EventPattern opens a real subscription" classname="message controller inheritance [memory]" time="0.000268" file="modules/microservice/test/inheritance.memory.test.ts" line="112" assertions="0" />
+      <testcase name="[P2.microservice.inheritance.memory.I03] base and subclass handlers both receive one emit (fan-out inside one controller)" classname="message controller inheritance [memory]" time="0.000092" file="modules/microservice/test/inheritance.memory.test.ts" line="112" assertions="1" />
+      <testcase name="[P2.microservice.inheritance.memory.I04] the inherited exact subscription stays selective" classname="message controller inheritance [memory]" time="0.150254" file="modules/microservice/test/inheritance.memory.test.ts" line="112" assertions="1" />
+      <testcase name="[P2.microservice.inheritance.memory.I05] a redelivery is still one logical event for each handler" classname="message controller inheritance [memory]" time="0.15047" file="modules/microservice/test/inheritance.memory.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.inheritance.memory.I06] two @MessagePattern handlers resolving to one pattern fail to boot" classname="message controller inheritance [memory]" time="0.001358" file="modules/microservice/test/inheritance.memory.test.ts" line="112" assertions="5" />
+      <testcase name="[P2.microservice.inheritance.memory.I07] an unknown handler on the inheriting controller is still unknown" classname="message controller inheritance [memory]" time="0.000134" file="modules/microservice/test/inheritance.memory.test.ts" line="112" assertions="1" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="modules/microservice/test/inheritance.redis.test.ts" file="modules/microservice/test/inheritance.redis.test.ts" tests="7" assertions="12" failures="0" skipped="0" time="2.154741575" hostname="Duffy">
+    <testsuite name="message controller inheritance [redis]" file="modules/microservice/test/inheritance.redis.test.ts" line="116" tests="7" assertions="12" failures="0" skipped="0" time="1.7" hostname="Duffy">
+      <testcase name="[P2.microservice.inheritance.redis.I01] a @MessagePattern declared on the base class answers over the transport" classname="message controller inheritance [redis]" time="0.001392" file="modules/microservice/test/inheritance.redis.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.inheritance.redis.I02] an inherited @EventPattern opens a real subscription" classname="message controller inheritance [redis]" time="0.000629" file="modules/microservice/test/inheritance.redis.test.ts" line="112" assertions="0" />
+      <testcase name="[P2.microservice.inheritance.redis.I03] base and subclass handlers both receive one emit (fan-out inside one controller)" classname="message controller inheritance [redis]" time="0.000399" file="modules/microservice/test/inheritance.redis.test.ts" line="112" assertions="1" />
+      <testcase name="[P2.microservice.inheritance.redis.I04] the inherited exact subscription stays selective" classname="message controller inheritance [redis]" time="0.401469" file="modules/microservice/test/inheritance.redis.test.ts" line="112" assertions="1" />
+      <testcase name="[P2.microservice.inheritance.redis.I05] a redelivery is still one logical event for each handler" classname="message controller inheritance [redis]" time="0.403162" file="modules/microservice/test/inheritance.redis.test.ts" line="112" assertions="2" />
+      <testcase name="[P2.microservice.inheritance.redis.I06] two @MessagePattern handlers resolving to one pattern fail to boot" classname="message controller inheritance [redis]" time="0.094109" file="modules/microservice/test/inheritance.redis.test.ts" line="112" assertions="5" />
+      <testcase name="[P2.microservice.inheritance.redis.I07] an unknown handler on the inheriting controller is still unknown" classname="message controller inheritance [redis]" time="0.801338" file="modules/microservice/test/inheritance.redis.test.ts" line="112" assertions="1" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="modules/microservice/test/mixed.test.ts" file="modules/microservice/test/mixed.test.ts" tests="5" assertions="19" failures="0" skipped="0" time="43.352163213" hostname="Duffy">
+    <testsuite name="MX1: dual boot + health" file="modules/microservice/test/mixed.test.ts" line="116" tests="1" assertions="8" failures="0" skipped="0" time="0.013" hostname="Duffy">
+      <testcase name="[P2.microservice.mixed.MX1] both transports run in one process: healthz reports both connected and both flows reach the same pids" classname="MX1: dual boot + health" time="0.013413" file="modules/microservice/test/mixed.test.ts" line="112" assertions="8" />
+    </testsuite>
+    <testsuite name="MX2: broker isolation" file="modules/microservice/test/mixed.test.ts" line="116" tests="1" assertions="3" failures="0" skipped="0" time="0.813" hostname="Duffy">
+      <testcase name="[P2.microservice.mixed.MX2] events published on the wrong broker reach nobody" classname="MX2: broker isolation" time="0.813963" file="modules/microservice/test/mixed.test.ts" line="112" assertions="3" />
+    </testsuite>
+    <testsuite name="MX3: cross-broker bridge" file="modules/microservice/test/mixed.test.ts" line="116" tests="1" assertions="5" failures="0" skipped="0" time="0.058" hostname="Duffy">
+      <testcase name="[P2.microservice.mixed.MX3] a kafka event is bridged onto redis with its headers carried across" classname="MX3: cross-broker bridge" time="0.058835" file="modules/microservice/test/mixed.test.ts" line="112" assertions="5" />
+    </testsuite>
+    <testsuite name="MX4: partial outage - kafka down, redis flows on" file="modules/microservice/test/mixed.test.ts" line="116" tests="1" assertions="3" failures="0" skipped="0" time="17.774" hostname="Duffy">
+      <testcase name="[P2.microservice.mixed.MX4] healthz degrades with kafka disconnected and default connected, redis keeps flowing, then everything recovers" classname="MX4: partial outage - kafka down, redis flows on" time="17.774111" file="modules/microservice/test/mixed.test.ts" line="112" assertions="3" />
+    </testsuite>
+    <testsuite name="MX5: graceful shutdown + lifecycle durability" file="modules/microservice/test/mixed.test.ts" line="116" tests="1" assertions="0" failures="0" skipped="0" time="1.868" hostname="Duffy">
+      <testcase name="[P2.microservice.mixed.MX5] stops cleanly with both transports active and resumes the durable kafka group after respawn" classname="MX5: graceful shutdown + lifecycle durability" time="1.86807" file="modules/microservice/test/mixed.test.ts" line="112" assertions="0" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="modules/microservice/test/resilience.kafka.test.ts" file="modules/microservice/test/resilience.kafka.test.ts" tests="11" assertions="64" failures="0" skipped="0" time="109.874106767" hostname="Duffy">
+    <testsuite name="R1: replica SIGKILL mid-RPC -&gt; rebalance takeover on the survivor" file="modules/microservice/test/resilience.kafka.test.ts" line="116" tests="1" assertions="2" failures="0" skipped="0" time="4.007" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.kafka.R1] a caller with a long timeout gets the reply from the second replica" classname="R1: replica SIGKILL mid-RPC -&gt; rebalance takeover on the survivor" time="4.00772" file="modules/microservice/test/resilience.kafka.test.ts" line="112" assertions="2" />
+    </testsuite>
+    <testsuite name="R1b: a stale request past its caller timeout is dropped on takeover, not re-executed" file="modules/microservice/test/resilience.kafka.test.ts" line="116" tests="1" assertions="3" failures="0" skipped="0" time="4.097" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.kafka.R1b] the survivor commits the stale record without re-running the handler and without DLQ" classname="R1b: a stale request past its caller timeout is dropped on takeover, not re-executed" time="4.097183" file="modules/microservice/test/resilience.kafka.test.ts" line="112" assertions="3" />
+    </testsuite>
+    <testsuite name="R2: graceful shutdown keeps an uncommitted failed event for the next instance" file="modules/microservice/test/resilience.kafka.test.ts" line="116" tests="1" assertions="0" failures="0" skipped="0" time="1.174" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.kafka.R2] the replacement instance receives the event with attempt &gt;= 2" classname="R2: graceful shutdown keeps an uncommitted failed event for the next instance" time="1.174958" file="modules/microservice/test/resilience.kafka.test.ts" line="112" assertions="0" />
+    </testsuite>
+    <testsuite name="R3: a poison event lands in the DLQ topic with provenance" file="modules/microservice/test/resilience.kafka.test.ts" line="116" tests="1" assertions="5" failures="0" skipped="0" time="7.222" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.kafka.R3] after maxRetries seek-based redeliveries the record moves to the DLQ" classname="R3: a poison event lands in the DLQ topic with provenance" time="7.222624" file="modules/microservice/test/resilience.kafka.test.ts" line="112" assertions="5" />
+    </testsuite>
+    <testsuite name="R4: rolling deploy with zero failed requests" file="modules/microservice/test/resilience.kafka.test.ts" line="116" tests="1" assertions="38" failures="0" skipped="0" time="6.465" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.kafka.R4] 30 requests across a graceful replica swap all succeed exactly once" classname="R4: rolling deploy with zero failed requests" time="6.465222" file="modules/microservice/test/resilience.kafka.test.ts" line="112" assertions="38" />
+    </testsuite>
+    <testsuite name="R5: gateway graceful stop lets in-flight HTTP finish its RPC" file="modules/microservice/test/resilience.kafka.test.ts" line="116" tests="1" assertions="2" failures="0" skipped="0" time="1.018" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.kafka.R5] a request in flight during SIGTERM still gets its reply" classname="R5: gateway graceful stop lets in-flight HTTP finish its RPC" time="1.018456" file="modules/microservice/test/resilience.kafka.test.ts" line="112" assertions="2" />
+    </testsuite>
+    <testsuite name="R6: events emitted while the consumer is down are not lost" file="modules/microservice/test/resilience.kafka.test.ts" line="116" tests="1" assertions="0" failures="0" skipped="0" time="1.303" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.kafka.R6] a replacement instance drains the backlog exactly once" classname="R6: events emitted while the consumer is down are not lost" time="1.30387" file="modules/microservice/test/resilience.kafka.test.ts" line="112" assertions="0" />
+    </testsuite>
+    <testsuite name="R7a: requests sent before a service&apos;s first boot are invisible (latest reset)" file="modules/microservice/test/resilience.kafka.test.ts" line="116" tests="1" assertions="2" failures="0" skipped="0" time="5.917" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.kafka.R7a] a pre-birth request neither answers nor executes after boot" classname="R7a: requests sent before a service&apos;s first boot are invisible (latest reset)" time="5.917914" file="modules/microservice/test/resilience.kafka.test.ts" line="112" assertions="2" />
+    </testsuite>
+    <testsuite name="R7b: a stale request in the restart backlog is dropped, never executed" file="modules/microservice/test/resilience.kafka.test.ts" line="116" tests="1" assertions="5" failures="0" skipped="0" time="2.466" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.kafka.R7b] the zombie is dropped and the retrying caller converges on one booking" classname="R7b: a stale request in the restart backlog is dropped, never executed" time="2.466698" file="modules/microservice/test/resilience.kafka.test.ts" line="112" assertions="5" />
+    </testsuite>
+    <testsuite name="R8: consumer group deleted between instances -&gt; delivery resumes with a gap" file="modules/microservice/test/resilience.kafka.test.ts" line="116" tests="1" assertions="2" failures="0" skipped="0" time="2.18" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.kafka.R8] delivery resumes after the group vanishes; the pre-loss event is not replayed" classname="R8: consumer group deleted between instances -&gt; delivery resumes with a gap" time="2.180693" file="modules/microservice/test/resilience.kafka.test.ts" line="112" assertions="2" />
+    </testsuite>
+    <testsuite name="R9: broker connection loss -&gt; health degrades, then full recovery" file="modules/microservice/test/resilience.kafka.test.ts" line="116" tests="1" assertions="5" failures="0" skipped="0" time="18.038" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.kafka.R9] healthz reports the outage and a full round-trip works after a broker restart" classname="R9: broker connection loss -&gt; health degrades, then full recovery" time="18.038892" file="modules/microservice/test/resilience.kafka.test.ts" line="112" assertions="5" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="modules/microservice/test/resilience.memory.test.ts" file="modules/microservice/test/resilience.memory.test.ts" tests="1" assertions="2" failures="0" skipped="0" time="1.196623747" hostname="Duffy">
+    <testcase name="[P2.microservice.resilience.memory.R5] a graceful stop lets an in-flight HTTP request finish its RPC" classname="" time="1.106284" file="modules/microservice/test/resilience.memory.test.ts" line="112" assertions="2" />
+  </testsuite>
+  <testsuite name="modules/microservice/test/resilience.redis.test.ts" file="modules/microservice/test/resilience.redis.test.ts" tests="11" assertions="63" failures="0" skipped="0" time="31.447777267" hostname="Duffy">
+    <testsuite name="R1: replica SIGKILL mid-RPC -&gt; sweep rescue on the survivor" file="modules/microservice/test/resilience.redis.test.ts" line="116" tests="1" assertions="2" failures="0" skipped="0" time="4.492" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.redis.R1] a caller with a long timeout gets the reply from the second replica" classname="R1: replica SIGKILL mid-RPC -&gt; sweep rescue on the survivor" time="4.492876" file="modules/microservice/test/resilience.redis.test.ts" line="112" assertions="2" />
+    </testsuite>
+    <testsuite name="R1b: a stale request past its caller timeout is dropped by the sweep, not re-executed" file="modules/microservice/test/resilience.redis.test.ts" line="116" tests="1" assertions="3" failures="0" skipped="0" time="4.498" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.redis.R1b] the sweep acks the stale entry without re-running the handler and without DLQ" classname="R1b: a stale request past its caller timeout is dropped by the sweep, not re-executed" time="4.498899" file="modules/microservice/test/resilience.redis.test.ts" line="112" assertions="3" />
+    </testsuite>
+    <testsuite name="R2: graceful shutdown keeps a pending failed event for the next instance" file="modules/microservice/test/resilience.redis.test.ts" line="116" tests="1" assertions="0" failures="0" skipped="0" time="2.406" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.redis.R2] the replacement instance receives the event with attempt &gt;= 2" classname="R2: graceful shutdown keeps a pending failed event for the next instance" time="2.406271" file="modules/microservice/test/resilience.redis.test.ts" line="112" assertions="0" />
+    </testsuite>
+    <testsuite name="R3: a poison event lands in the DLQ with provenance" file="modules/microservice/test/resilience.redis.test.ts" line="116" tests="1" assertions="5" failures="0" skipped="0" time="6.011" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.redis.R3] after maxRetries sweep redeliveries the entry moves to the DLQ" classname="R3: a poison event lands in the DLQ with provenance" time="6.011586" file="modules/microservice/test/resilience.redis.test.ts" line="112" assertions="5" />
+    </testsuite>
+    <testsuite name="R4: rolling deploy with zero failed requests" file="modules/microservice/test/resilience.redis.test.ts" line="116" tests="1" assertions="38" failures="0" skipped="0" time="3.228" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.redis.R4] 30 requests across a graceful replica swap all succeed exactly once" classname="R4: rolling deploy with zero failed requests" time="3.228514" file="modules/microservice/test/resilience.redis.test.ts" line="112" assertions="38" />
+    </testsuite>
+    <testsuite name="R5: gateway graceful stop lets in-flight HTTP finish its RPC" file="modules/microservice/test/resilience.redis.test.ts" line="116" tests="1" assertions="2" failures="0" skipped="0" time="1.005" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.redis.R5] a request in flight during SIGTERM still gets its reply" classname="R5: gateway graceful stop lets in-flight HTTP finish its RPC" time="1.005799" file="modules/microservice/test/resilience.redis.test.ts" line="112" assertions="2" />
+    </testsuite>
+    <testsuite name="R6: events emitted while the consumer is down are not lost" file="modules/microservice/test/resilience.redis.test.ts" line="116" tests="1" assertions="0" failures="0" skipped="0" time="0.3" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.redis.R6] a replacement instance drains the backlog exactly once" classname="R6: events emitted while the consumer is down are not lost" time="0.30047" file="modules/microservice/test/resilience.redis.test.ts" line="112" assertions="0" />
+    </testsuite>
+    <testsuite name="R7a: requests sent before a service&apos;s first boot are invisible (&apos;$&apos; group start)" file="modules/microservice/test/resilience.redis.test.ts" line="116" tests="1" assertions="2" failures="0" skipped="0" time="2.903" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.redis.R7a] a pre-birth request neither answers nor executes after boot" classname="R7a: requests sent before a service&apos;s first boot are invisible (&apos;$&apos; group start)" time="2.903273" file="modules/microservice/test/resilience.redis.test.ts" line="112" assertions="2" />
+    </testsuite>
+    <testsuite name="R7b: a stale request in the restart backlog executes once (documented at-least-once)" file="modules/microservice/test/resilience.redis.test.ts" line="116" tests="1" assertions="4" failures="0" skipped="0" time="1.101" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.redis.R7b] the zombie executes exactly once and domain idempotency absorbs the retry" classname="R7b: a stale request in the restart backlog executes once (documented at-least-once)" time="1.101716" file="modules/microservice/test/resilience.redis.test.ts" line="112" assertions="4" />
+    </testsuite>
+    <testsuite name="R8: consumer group destroyed mid-run -&gt; automatic NOGROUP recovery" file="modules/microservice/test/resilience.redis.test.ts" line="116" tests="1" assertions="2" failures="0" skipped="0" time="0.001" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.redis.R8] delivery resumes after the group vanishes; replayed entries are deduped" classname="R8: consumer group destroyed mid-run -&gt; automatic NOGROUP recovery" time="0.001595" file="modules/microservice/test/resilience.redis.test.ts" line="112" assertions="2" />
+    </testsuite>
+    <testsuite name="R9: broker connection loss -&gt; health degrades, then full recovery" file="modules/microservice/test/resilience.redis.test.ts" line="116" tests="1" assertions="5" failures="0" skipped="0" time="1.308" hostname="Duffy">
+      <testcase name="[P2.microservice.resilience.redis.R9] healthz reports the outage and a full round-trip works after reconnect" classname="R9: broker connection loss -&gt; health degrades, then full recovery" time="1.308481" file="modules/microservice/test/resilience.redis.test.ts" line="112" assertions="5" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="modules/openapi/openapi.test.ts" file="modules/openapi/openapi.test.ts" tests="11" assertions="57" failures="0" skipped="0" time="0.063234921" hostname="Duffy">
+    <testcase name="[P2.openapi.001] the spec route answers 200 JSON with openapi 3.1.0 and the configured info" classname="" time="0.009367" file="modules/openapi/openapi.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.openapi.002] the UI route answers HTML with the Swagger UI bundle pointing at the spec" classname="" time="0.002317" file="modules/openapi/openapi.test.ts" line="112" assertions="6" />
+    <testcase name="[P2.openapi.010] path params are converted to {name} and documented as required path parameters" classname="" time="0.001964" file="modules/openapi/openapi.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.openapi.011] a zod json validator becomes the required application/json requestBody" classname="" time="0.00478" file="modules/openapi/openapi.test.ts" line="112" assertions="7" />
+    <testcase name="[P2.openapi.012] a zod query validator becomes optional query parameters" classname="" time="0.002428" file="modules/openapi/openapi.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.openapi.013] zod .describe() texts reach parameters, properties and the request body" classname="" time="0.002446" file="modules/openapi/openapi.test.ts" line="112" assertions="5" />
+    <testcase name="[P2.openapi.014] controllers become tags and a controller description becomes the tag description" classname="" time="0.001872" file="modules/openapi/openapi.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.openapi.015] route summary and description are taken from the route decorator" classname="" time="0.001778" file="modules/openapi/openapi.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.openapi.020] a Context.define route documents its body, query and params schemas" classname="" time="0.002413" file="modules/openapi/openapi.test.ts" line="112" assertions="5" />
+    <testcase name="[P2.openapi.030] @Hidden hides class and method routes from the spec while they still answer" classname="" time="0.002046" file="modules/openapi/openapi.test.ts" line="112" assertions="16" />
+    <testcase name="[P2.openapi.040] a global middleware from the config runs for the spec and UI routes" classname="" time="0.001933" file="modules/openapi/openapi.test.ts" line="112" assertions="3" />
+  </testsuite>
+  <testsuite name="modules/otel/extended.test.ts" file="modules/otel/extended.test.ts" tests="4" assertions="25" failures="0" skipped="0" time="0.195971998" hostname="Duffy">
+    <testcase name="[P2.otel.030] @Repository CRUD calls produce INTERNAL spans under the controller span" classname="" time="0.017121" file="modules/otel/extended.test.ts" line="112" assertions="10" />
+    <testcase name="[P2.otel.031] @Redis and CacheService calls produce INTERNAL spans in the request trace" classname="" time="0.003479" file="modules/otel/extended.test.ts" line="112" assertions="6" />
+    <testcase name="[P2.otel.032] @Middleware and @Component classes are not traced" classname="" time="0.002541" file="modules/otel/extended.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.otel.033] a controller behind a route middleware keeps the request trace, and a rejected request has no controller span" classname="" time="0.002667" file="modules/otel/extended.test.ts" line="112" assertions="5" />
+  </testsuite>
+  <testsuite name="modules/otel/features.test.ts" file="modules/otel/features.test.ts" tests="1" assertions="6" failures="0" skipped="0" time="0.066930663" hostname="Duffy">
+    <testcase name="[P2.otel.020] ignoreRoutes leaves /health without a span and without a metric point" classname="" time="0.006043" file="modules/otel/features.test.ts" line="112" assertions="6" />
+  </testsuite>
+  <testsuite name="modules/otel/metrics.test.ts" file="modules/otel/metrics.test.ts" tests="3" assertions="213" failures="0" skipped="0" time="0.080784431" hostname="Duffy">
+    <testcase name="[P2.otel.010] the request counter and duration histogram get one series per route, method and status" classname="" time="0.006204" file="modules/otel/metrics.test.ts" line="112" assertions="6" />
+    <testcase name="[P2.otel.011] unmatched paths collapse into one 404 series" classname="" time="0.002894" file="modules/otel/metrics.test.ts" line="112" assertions="5" />
+    <testcase name="[P2.otel.012] 200 unique scanner paths stay one bounded metric series" classname="" time="0.010454" file="modules/otel/metrics.test.ts" line="112" assertions="202" />
+  </testsuite>
+  <testsuite name="modules/otel/tracing.test.ts" file="modules/otel/tracing.test.ts" tests="6" assertions="30" failures="0" skipped="0" time="0.080979953" hostname="Duffy">
+    <testcase name="[P2.otel.001] one SERVER span per request carries method, url.path and status" classname="" time="0.00531" file="modules/otel/tracing.test.ts" line="112" assertions="5" />
+    <testcase name="[P2.otel.002] span name and http.route use the route pattern, not the concrete path" classname="" time="0.002678" file="modules/otel/tracing.test.ts" line="112" assertions="7" />
+    <testcase name="[P2.otel.003] the status attribute equals the real status for 200, 201, HttpException 403, validation 400 and unmatched 404 [cap:middleware.codeAfterNextRuns]" classname="" time="0.004379" file="modules/otel/tracing.test.ts" line="101" assertions="2" />
+    <testcase name="[P2.otel.004] controller and service INTERNAL spans are parented to the SERVER span" classname="" time="0.002474" file="modules/otel/tracing.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.otel.005] an incoming traceparent continues the trace" classname="" time="0.002556" file="modules/otel/tracing.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.otel.006] a ulak send from a handler carries traceparent and the consumer span joins the trace" classname="" time="0.002938" file="modules/otel/tracing.test.ts" line="112" assertions="9" />
+  </testsuite>
+  <testsuite name="modules/otel-leak-sim/leak-sim.test.ts" file="modules/otel-leak-sim/leak-sim.test.ts" tests="3" assertions="7" failures="0" skipped="0" time="1.558241326" hostname="Duffy">
+    <testcase name="[P2.otel-leak-sim.001] the frozen leaky control is detected as a leak (harness sensitivity)" classname="" time="0.749127" file="modules/otel-leak-sim/leak-sim.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.otel-leak-sim.002] the released middleware plateaus with at most 64 duration data points" classname="" time="0.78291" file="modules/otel-leak-sim/leak-sim.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.otel-leak-sim.003] fixed growth in the last wave is at most 1 % of the leaky growth under the same traffic" classname="" time="0.000091" file="modules/otel-leak-sim/leak-sim.test.ts" line="112" assertions="2" />
+  </testsuite>
+  <testsuite name="modules/redis/redis.test.ts" file="modules/redis/redis.test.ts" tests="9" assertions="44" failures="0" skipped="0" time="0.09971423" hostname="Duffy">
+    <testcase name="[P2.redis.001] string set/get/del/incr/decr/exists" classname="" time="0.008381" file="modules/redis/redis.test.ts" line="112" assertions="8" />
+    <testcase name="[P2.redis.002] set with ttl and expire give a ttl in (0, n]" classname="" time="0.002876" file="modules/redis/redis.test.ts" line="112" assertions="6" />
+    <testcase name="[P2.redis.003] hash hmset/hget/hmget" classname="" time="0.001897" file="modules/redis/redis.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.redis.004] set sadd/srem/smembers/sismember" classname="" time="0.001847" file="modules/redis/redis.test.ts" line="112" assertions="8" />
+    <testcase name="[P2.redis.005] keys by pattern stay inside the run namespace" classname="" time="0.001779" file="modules/redis/redis.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.redis.010] CacheService.getOrSet on a miss calls the factory once and stores the value" classname="" time="0.002521" file="modules/redis/redis.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.redis.011] CacheService.getOrSet on a hit does not call the factory again" classname="" time="0.002267" file="modules/redis/redis.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.redis.012] CacheService.invalidate makes the next getOrSet call the factory again" classname="" time="0.001977" file="modules/redis/redis.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.redis.020] the @Redis component connects through the env URL and disconnects when the app stops" classname="" time="0.002743" file="modules/redis/redis.test.ts" line="112" assertions="5" />
+  </testsuite>
+  <testsuite name="modules/redis-ws/redis-ws.test.ts" file="modules/redis-ws/redis-ws.test.ts" tests="9" assertions="59" failures="0" skipped="0" time="1.236812269" hostname="Duffy">
+    <testcase name="[P2.redis-ws.001] a broadcast from either pod reaches the clients of both pods" classname="" time="0.015225" file="modules/redis-ws/redis-ws.test.ts" line="112" assertions="8" />
+    <testcase name="[P2.redis-ws.002] a room message reaches the members on both pods and nobody else" classname="" time="0.206588" file="modules/redis-ws/redis-ws.test.ts" line="112" assertions="8" />
+    <testcase name="[P2.redis-ws.003] toSocket from one pod reaches a socket held by the other pod only" classname="" time="0.206283" file="modules/redis-ws/redis-ws.test.ts" line="112" assertions="4" />
+    <testcase name="[P2.redis-ws.004] the socket count is per pod" classname="" time="0.005557" file="modules/redis-ws/redis-ws.test.ts" line="112" assertions="5" />
+    <testcase name="[P2.redis-ws.005] socket.publish leaves the sender out locally and reaches the remote member" classname="" time="0.20518" file="modules/redis-ws/redis-ws.test.ts" line="112" assertions="8" />
+    <testcase name="[P2.redis-ws.006] stopping the pods destroys the transport: no Redis subscriber is left on the channel" classname="" time="0.004667" file="modules/redis-ws/redis-ws.test.ts" line="112" assertions="2" />
+    <testcase name="[P2.redis-ws.010] an unreachable Redis fails start() instead of escaping as an unhandled rejection" classname="" time="0.052453" file="modules/redis-ws/redis-ws.test.ts" line="112" assertions="3" />
+    <testcase name="[P2.redis-ws.011] each pod has its WebSocket service server assigned when its start() resolves" classname="" time="0.053175" file="modules/redis-ws/redis-ws.test.ts" line="112" assertions="1" />
+    <testcase name="[P2.redis-ws.020] pods of two different adapters share the transport: broadcast, rooms and toSocket" classname="" time="0.420727" file="modules/redis-ws/redis-ws.test.ts" line="112" assertions="20" />
+  </testsuite>
+</testsuites>

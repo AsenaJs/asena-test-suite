@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="207" assertions="882" failures="0" skipped="0" time="3.330159914">
+  <testsuite name="test/routing.test.ts" file="test/routing.test.ts" tests="25" assertions="137" failures="0" skipped="0" time="0.073157673" hostname="Duffy">
+    <testsuite name="routing" file="test/routing.test.ts" line="116" tests="25" assertions="137" failures="0" skipped="0" time="0.038" hostname="Duffy">
+      <testcase name="[P1.routing.001] CRUD: an empty list answers 200 []" classname="routing" time="0.008779" file="test/routing.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.routing.002] CRUD: create answers 201 with the stored item" classname="routing" time="0.002214" file="test/routing.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.routing.003] CRUD: get by id answers the item" classname="routing" time="0.001688" file="test/routing.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.routing.004] CRUD: update answers the changed item and the change is stored" classname="routing" time="0.00166" file="test/routing.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.routing.005] CRUD: delete answers 204 with an empty body" classname="routing" time="0.001459" file="test/routing.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.routing.006] CRUD: get after delete answers 404 with the handler body" classname="routing" time="0.001485" file="test/routing.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.routing.007] GET /health answers status ok and a positive uptime" classname="routing" time="0.001439" file="test/routing.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.routing.010] a path parameter is echoed" classname="routing" time="0.001364" file="test/routing.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.routing.011] two path parameters are both read" classname="routing" time="0.001367" file="test/routing.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.routing.012] a URL-encoded path parameter is decoded" classname="routing" time="0.001289" file="test/routing.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.routing.020] each method decorator answers only its own method" classname="routing" time="0.00232" file="test/routing.test.ts" line="112" assertions="50" />
+      <testcase name="[P1.routing.021] @All answers every method" classname="routing" time="0.001593" file="test/routing.test.ts" line="112" assertions="10" />
+      <testcase name="[P1.routing.022] HEAD on a GET route answers the headers with an empty body" classname="routing" time="0.001394" file="test/routing.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.routing.023] OPTIONS without CORS: 404 on a GET-only route, handled by @All" classname="routing" time="0.001756" file="test/routing.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.routing.024] TRACE over a raw socket: @Trace answers 200, a GET path 404, the server keeps serving" classname="routing" time="0.002113" file="test/routing.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.routing.025] CONNECT over a raw socket: @Connect answers 200, a GET path 404, the server keeps serving" classname="routing" time="0.001677" file="test/routing.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.routing.030] a static segment beats an inherited param segment registered first" classname="routing" time="0.001501" file="test/routing.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.routing.040] a trailing slash /x/ answers like /x on an API route" classname="routing" time="0.001808" file="test/routing.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.routing.050] onNotFound receives the path without query and the upper-case method" classname="routing" time="0.00204" file="test/routing.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.routing.051] a method miss on an existing path goes through onNotFound with 404, not 405" classname="routing" time="0.001675" file="test/routing.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.routing.052] without any config an unmatched request answers the default 404" classname="routing" time="0.00171" file="test/routing.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.routing.060] route inheritance: base, own, override by name, decorated override, path-only" classname="routing" time="0.002" file="test/routing.test.ts" line="112" assertions="10" />
+      <testcase name="[P1.routing.061] a metadata-only decorator does not change routing" classname="routing" time="0.001637" file="test/routing.test.ts" line="112" assertions="6" />
+      <testcase name="[P1.routing.070] ctx.routePattern read after next() in a global middleware is the matched pattern [cap:middleware.codeAfterNextRuns]" classname="routing" time="0.002129" file="test/routing.test.ts" line="101" assertions="3" />
+      <testcase name="[P1.routing.071] an unmatched request exposes no route pattern to a global middleware" classname="routing" time="0.00142" file="test/routing.test.ts" line="112" assertions="3" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/00-resolution.test.ts" file="test/00-resolution.test.ts" tests="5" assertions="6" failures="0" skipped="0" time="0.002396024" hostname="Duffy">
+    <testsuite name="resolution" file="test/00-resolution.test.ts" line="116" tests="5" assertions="6" failures="0" skipped="0" time="0" hostname="Duffy">
+      <testcase name="[P1.resolution.001] one @asenajs/asena copy for the conformance package and the adapter" classname="resolution" time="0.000114" file="test/00-resolution.test.ts" line="112" assertions="1" />
+      <testcase name="[P1.resolution.002] @PostConstruct runs in an app booted with the adapter" classname="resolution" time="0.000767" file="test/00-resolution.test.ts" line="112" assertions="1" />
+      <testcase name="[P1.resolution.003] installed core satisfies the conformance peer range" classname="resolution" time="0.000648" file="test/00-resolution.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.resolution.004] conformance fixtures carry legacy decorator metadata" classname="resolution" time="0.000129" file="test/00-resolution.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.resolution.010] the descriptor declares no divergence flags or unknown keys" classname="resolution" time="0.000016" file="test/00-resolution.test.ts" line="112" assertions="0" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/static.test.ts" file="test/static.test.ts" tests="15" assertions="92" failures="0" skipped="0" time="0.029892107" hostname="Duffy">
+    <testsuite name="static" file="test/static.test.ts" line="116" tests="15" assertions="92" failures="0" skipped="0" time="0.02" hostname="Duffy">
+      <testcase name="[P1.static.001] a static file is served with its exact body and a matching content-type" classname="static" time="0.002393" file="test/static.test.ts" line="112" assertions="6" />
+      <testcase name="[P1.static.002] a missing static file answers 404 without reaching the route handler" classname="static" time="0.001557" file="test/static.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.static.003] rewriteRequestPath receives the request path and its result picks the file" classname="static" time="0.001589" file="test/static.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.static.004] onFound is called once with the path of the served file" classname="static" time="0.001537" file="test/static.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.static.005] onNotFound is called once with the path of the missing file" classname="static" time="0.001517" file="test/static.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.static.006] an @Override onNotFound marks the miss handled and the route handler answers" classname="static" time="0.001842" file="test/static.test.ts" line="112" assertions="7" />
+      <testcase name="[P1.static.007] an inherited static route serves under the subclass prefix" classname="static" time="0.001618" file="test/static.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.static.008] a missing static file is answered by the config onNotFound after the file hook ran" classname="static" time="0.002884" file="test/static.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.static.010] path traversal never serves a file outside the static root" classname="static" time="0.002474" file="test/static.test.ts" line="112" assertions="38" />
+      <testcase name="[P1.static.011] malformed percent-encoding answers 400 or 404, never 500" classname="static" time="0.002123" file="test/static.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.static.020] a @Page route serves the HTML page" classname="static" time="0.002745" file="test/static.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.static.021] a @Page route answers its trailing-slash spelling too" classname="static" time="0.00196" file="test/static.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.static.022] a @Page declared on a base class is served under the subclass prefix" classname="static" time="0.00199" file="test/static.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.static.023] an HTML route bypasses a global guard that blocks API routes" classname="static" time="0.002385" file="test/static.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.static.024] a @Page on the path of an API route is rejected at boot" classname="static" time="0.000724" file="test/static.test.ts" line="112" assertions="3" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/streaming.test.ts" file="test/streaming.test.ts" tests="16" assertions="69" failures="0" skipped="0" time="0.044524084" hostname="Duffy">
+    <testsuite name="streaming" file="test/streaming.test.ts" line="116" tests="16" assertions="69" failures="0" skipped="0" time="0.033" hostname="Duffy">
+      <testcase name="[P1.streaming.001] streamSSE sets text/event-stream and no-cache" classname="streaming" time="0.002646" file="test/streaming.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.streaming.002] five JSON events keep their event, id and order" classname="streaming" time="0.001882" file="test/streaming.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.streaming.003] the retry field is written and the last event completes" classname="streaming" time="0.001736" file="test/streaming.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.streaming.004] multi-line data is split into data: lines that rejoin with \n" classname="streaming" time="0.001659" file="test/streaming.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.streaming.005] a comment-only frame is written as comment lines" classname="streaming" time="0.001542" file="test/streaming.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.streaming.006] a frame with neither data nor comment rejects into the error callback and writes nothing" classname="streaming" time="0.00172" file="test/streaming.test.ts" line="112" assertions="6" />
+      <testcase name="[P1.streaming.007] the streamSSE error callback writes an error event with the exact payload" classname="streaming" time="0.001544" file="test/streaming.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.streaming.008] a client abort on a long-lived SSE fires onAbort on the server" classname="streaming" time="0.011932" file="test/streaming.test.ts" line="112" assertions="7" />
+      <testcase name="[P1.streaming.010] streamText sets text/plain, nosniff and delivers the exact text" classname="streaming" time="0.0019" file="test/streaming.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.streaming.011] writeln terminates every line with \n" classname="streaming" time="0.001585" file="test/streaming.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.streaming.012] the first chunk arrives before the handler finishes" classname="streaming" time="0.001542" file="test/streaming.test.ts" line="112" assertions="7" />
+      <testcase name="[P1.streaming.020] stream keeps a content-disposition set through setResponseHeader and writes the exact CSV" classname="streaming" time="0.001563" file="test/streaming.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.streaming.021] binary Uint8Array chunks arrive byte-exact" classname="streaming" time="0.001707" file="test/streaming.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.streaming.022] pipe forwards a ReadableStream and the writer stays usable" classname="streaming" time="0.00147" file="test/streaming.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.streaming.023] a mid-stream error keeps the partial body and appends the error marker" classname="streaming" time="0.001568" file="test/streaming.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.streaming.030] concurrent SSE and text streams stay complete and never interleave" classname="streaming" time="0.00759" file="test/streaming.test.ts" line="112" assertions="20" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/harness.test.ts" file="test/harness.test.ts" tests="10" assertions="34" failures="0" skipped="0" time="0.021831479" hostname="Duffy">
+    <testsuite name="harness" file="test/harness.test.ts" line="116" tests="10" assertions="34" failures="0" skipped="0" time="0.015" hostname="Duffy">
+      <testcase name="[P1.harness.001] createTestApp serves real routes through the fluent client" classname="harness" time="0.001745" file="test/harness.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.harness.002] createTestApp reports a consistent port and baseUrl" classname="harness" time="0.00152" file="test/harness.test.ts" line="112" assertions="6" />
+      <testcase name="[P1.harness.003] createTestApp overrides replace a service" classname="harness" time="0.001563" file="test/harness.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.harness.004] resolve(name) returns the instance the container wired" classname="harness" time="0.001434" file="test/harness.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.harness.010] createWebTest auto-mocks injected dependencies" classname="harness" time="0.001909" file="test/harness.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.harness.011] createWebTest registers the route validators for real" classname="harness" time="0.004355" file="test/harness.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.harness.012] a real component passed to createWebTest beats the auto-mock" classname="harness" time="0.001736" file="test/harness.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.harness.013] createWebTest with no config loaded answers an unknown route with 404" classname="harness" time="0.001353" file="test/harness.test.ts" line="112" assertions="0" />
+      <testcase name="[P1.harness.020] dispatch &apos;socket&apos; serves routes, params, 404, validators and WebSocket upgrades over a unix socket" classname="harness" time="0.003606" file="test/harness.test.ts" line="112" assertions="9" />
+      <testcase name="[P1.harness.030] `await using` disposes the app and frees its port" classname="harness" time="0.001705" file="test/harness.test.ts" line="112" assertions="2" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/smoke.test.ts" file="test/smoke.test.ts" tests="4" assertions="11" failures="0" skipped="0" time="0.007917297" hostname="Duffy">
+    <testsuite name="smoke" file="test/smoke.test.ts" line="116" tests="4" assertions="11" failures="0" skipped="0" time="0.005" hostname="Duffy">
+      <testcase name="[P1.smoke.001] a neutral controller answers 200" classname="smoke" time="0.001435" file="test/smoke.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.smoke.002] a route middleware runs and a zod legacy validator rejects a bad body with 400" classname="smoke" time="0.002477" file="test/smoke.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.smoke.003] a @Config onError receives the thrown error and answers" classname="smoke" time="0.001674" file="test/smoke.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.smoke.004] the built-in CORS middleware from the descriptor registers and answers" classname="smoke" time="0.001709" file="test/smoke.test.ts" line="112" assertions="3" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/lifecycle.test.ts" file="test/lifecycle.test.ts" tests="17" assertions="60" failures="0" skipped="0" time="0.045475939" hostname="Duffy">
+    <testsuite name="lifecycle" file="test/lifecycle.test.ts" line="116" tests="17" assertions="60" failures="0" skipped="0" time="0.038" hostname="Duffy">
+      <testcase name="[P1.lifecycle.001] an explicit port is the port the app serves on" classname="lifecycle" time="0.001406" file="test/lifecycle.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.lifecycle.002] port 0 binds a real port and serves on it" classname="lifecycle" time="0.00129" file="test/lifecycle.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.lifecycle.003] start() returns the Bun server listening on the requested port" classname="lifecycle" time="0.001207" file="test/lifecycle.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.lifecycle.004] start({ unix }) serves over the socket and binds no TCP port" classname="lifecycle" time="0.001292" file="test/lifecycle.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.lifecycle.005] an unknown start option is ignored and the app serves normally" classname="lifecycle" time="0.001552" file="test/lifecycle.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.lifecycle.006] AsenaAdapter.name is a non-empty string" classname="lifecycle" time="0.000031" file="test/lifecycle.test.ts" line="112" assertions="1" />
+      <testcase name="[P1.lifecycle.010] sync serveOptions() are applied: a body over maxRequestBodySize is rejected with 413" classname="lifecycle" time="0.001513" file="test/lifecycle.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.lifecycle.011] async serveOptions() are applied: a body over maxRequestBodySize is rejected with 413" classname="lifecycle" time="0.001336" file="test/lifecycle.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.lifecycle.020] a route registered from @OnStart answers and gets global middlewares and onError" classname="lifecycle" time="0.001883" file="test/lifecycle.test.ts" line="112" assertions="6" />
+      <testcase name="[P1.lifecycle.030] serveOptions is called after the @OnStart registerRoute" classname="lifecycle" time="0.001479" file="test/lifecycle.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.lifecycle.031] core drives the adapter in the documented call order" classname="lifecycle" time="0.001742" file="test/lifecycle.test.ts" line="112" assertions="12" />
+      <testcase name="[P1.lifecycle.032] two apps in one process answer independently" classname="lifecycle" time="0.002113" file="test/lifecycle.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.lifecycle.040] stop() resolves with an idle keep-alive connection open" classname="lifecycle" time="0.001514" file="test/lifecycle.test.ts" line="112" assertions="1" />
+      <testcase name="[P1.lifecycle.041] stop(false) lets an in-flight request finish; stop() closes it" classname="lifecycle" time="0.022287" file="test/lifecycle.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.lifecycle.042] stopping twice, sequentially and concurrently, is safe" classname="lifecycle" time="0.001346" file="test/lifecycle.test.ts" line="112" assertions="1" />
+      <testcase name="[P1.lifecycle.043] after stop() the port is free again" classname="lifecycle" time="0.001217" file="test/lifecycle.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.lifecycle.050] an adapter without onNotFound: core warns and the adapter fallback still answers 404" classname="lifecycle" time="0.001629" file="test/lifecycle.test.ts" line="112" assertions="5" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/websocket.test.ts" file="test/websocket.test.ts" tests="24" assertions="89" failures="0" skipped="0" time="2.427966479" hostname="Duffy">
+    <testsuite name="websocket" file="test/websocket.test.ts" line="116" tests="24" assertions="89" failures="0" skipped="0" time="2.415" hostname="Duffy">
+      <testcase name="[P1.websocket.001] an upgrade request opens a socket and runs onOpen" classname="websocket" time="0.002047" file="test/websocket.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.websocket.002] onMessage receives text and the reply carries the socket id" classname="websocket" time="0.001756" file="test/websocket.test.ts" line="112" assertions="1" />
+      <testcase name="[P1.websocket.003] two clients are served independently" classname="websocket" time="0.202248" file="test/websocket.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.websocket.004] a client close with 1000 reaches onClose with code 1000" classname="websocket" time="0.002902" file="test/websocket.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.websocket.005] an inherited @WebSocket subclass runs the undecorated base handlers" classname="websocket" time="0.002068" file="test/websocket.test.ts" line="112" assertions="1" />
+      <testcase name="[P1.websocket.006] a binary frame round-trips byte for byte" classname="websocket" time="0.001836" file="test/websocket.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.websocket.007] a server-initiated close(4001, reason) reaches the client exactly" classname="websocket" time="0.001639" file="test/websocket.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.websocket.010] an upgrade middleware returning false refuses the upgrade with 403" classname="websocket" time="0.001769" file="test/websocket.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.websocket.011] setWebSocketValue in an upgrade middleware is visible in ws.data.values" classname="websocket" time="0.001683" file="test/websocket.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.websocket.020] a room message reaches members only" classname="websocket" time="0.302312" file="test/websocket.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.websocket.021] after leaving a room nothing more arrives from it" classname="websocket" time="0.303499" file="test/websocket.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.websocket.022] an ulak broadcast from an HTTP route reaches every client" classname="websocket" time="0.003676" file="test/websocket.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.websocket.023] ulak toSocket reaches only the target socket" classname="websocket" time="0.303009" file="test/websocket.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.websocket.024] the ulak socket count follows opens and closes" classname="websocket" time="0.003541" file="test/websocket.test.ts" line="112" assertions="8" />
+      <testcase name="[P1.websocket.025] socket.publish reaches other room members but not the sender" classname="websocket" time="0.302637" file="test/websocket.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.websocket.030] heartbeat &apos;adapter&apos; pings every client and onPong counts the replies" classname="websocket" time="0.103981" file="test/websocket.test.ts" line="112" assertions="6" />
+      <testcase name="[P1.websocket.031] heartbeat &apos;native&apos; sends no adapter pings and keeps the socket open" classname="websocket" time="0.503178" file="test/websocket.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.websocket.032] a client ping reaches onPing for that socket" classname="websocket" time="0.012258" file="test/websocket.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.websocket.033] onDrain runs after backpressure and every frame still arrives" classname="websocket" time="0.112009" file="test/websocket.test.ts" line="112" assertions="11" />
+      <testcase name="[P1.websocket.040] start() resolves only after transport.init completed and service.server is assigned" classname="websocket" time="0.051777" file="test/websocket.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.websocket.041] a rejecting transport.init fails start() instead of escaping as an unhandled rejection" classname="websocket" time="0.200906" file="test/websocket.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.websocket.042] service.to(room) publishes through the configured transport" classname="websocket" time="0.002209" file="test/websocket.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.websocket.043] stop() destroys the configured transport" classname="websocket" time="0.002307" file="test/websocket.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.websocket.050] stop() with open sockets closes them and resolves" classname="websocket" time="0.001593" file="test/websocket.test.ts" line="112" assertions="5" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/validation.test.ts" file="test/validation.test.ts" tests="22" assertions="149" failures="0" skipped="0" time="0.040570689" hostname="Duffy">
+    <testsuite name="validation" file="test/validation.test.ts" line="116" tests="22" assertions="149" failures="0" skipped="0" time="0.028" hostname="Duffy">
+      <testcase name="[P1.validation.001] legacy json validator: invalid bodies answer 400, a valid body reaches the handler" classname="validation" time="0.003787" file="test/validation.test.ts" line="112" assertions="8" />
+      <testcase name="[P1.validation.002] legacy param validator: a non-UUID id answers 400" classname="validation" time="0.002492" file="test/validation.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.validation.003] legacy query validator with a coercing schema: 400 on garbage, 200 on a number" classname="validation" time="0.002197" file="test/validation.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.validation.004] legacy form validator: a missing field answers 400" classname="validation" time="0.002266" file="test/validation.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.validation.005] legacy header validator: a missing or short header answers 400" classname="validation" time="0.002376" file="test/validation.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.validation.006] onError receives a validation error that is an HttpException with status 400, target, issues and cause" classname="validation" time="0.002471" file="test/validation.test.ts" line="112" assertions="46" />
+      <testcase name="[P1.validation.007] a route inherited from an undecorated base class keeps its legacy validator" classname="validation" time="0.001765" file="test/validation.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.validation.008] a schema-with-hook whose hook returns a Response sends that Response" classname="validation" time="0.001637" file="test/validation.test.ts" line="112" assertions="6" />
+      <testcase name="[P1.validation.009] validatorCache: true answers repeated requests the same way and builds the schema once" classname="validation" time="0.002351" file="test/validation.test.ts" line="112" assertions="11" />
+      <testcase name="[P1.validation.010] the parsed body reaches the handler through getBody (transforms and defaults applied)" classname="validation" time="0.001835" file="test/validation.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.validation.030] a directly registered route with a non-boolean validatorCache fails the boot" classname="validation" time="0.001901" file="test/validation.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.validation.020] route context contract: ctx.input carries body, query, params and headers" classname="validation" time="0.001782" file="test/validation.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.validation.021] route context contract: an invalid body answers the exact 400 envelope" classname="validation" time="0.001531" file="test/validation.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.validation.022] route context contract: a non-JSON content type for a body schema answers 415" classname="validation" time="0.001326" file="test/validation.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.validation.023] route context contract: invalid JSON answers 400" classname="validation" time="0.001457" file="test/validation.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.validation.024] route context contract: an empty body is undefined input and the schema decides" classname="validation" time="0.001443" file="test/validation.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.validation.025] route context contract: body/form, query, params, headers validate in that order" classname="validation" time="0.002116" file="test/validation.test.ts" line="112" assertions="21" />
+      <testcase name="[P1.validation.026] a context class branded for another adapter fails the boot" classname="validation" time="0.000544" file="test/validation.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.validation.027] a route declaring both a context contract and a legacy validator fails the boot" classname="validation" time="0.0005" file="test/validation.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.validation.028] a directly registered route with contextContract but no contextClass fails the boot" classname="validation" time="0.000409" file="test/validation.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.validation.029] a directly registered route whose contextContract does not match its contextClass fails the boot" classname="validation" time="0.001753" file="test/validation.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.validation.031] route context contract: transformed input reaches the handler; a global middleware runs before validation" classname="validation" time="0.001643" file="test/validation.test.ts" line="112" assertions="4" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/middleware.test.ts" file="test/middleware.test.ts" tests="12" assertions="56" failures="0" skipped="0" time="0.022455813" hostname="Duffy">
+    <testsuite name="middleware" file="test/middleware.test.ts" line="116" tests="12" assertions="56" failures="0" skipped="0" time="0.015" hostname="Duffy">
+      <testcase name="[P1.middleware.001] a global include pattern guards only the matching routes" classname="middleware" time="0.001787" file="test/middleware.test.ts" line="112" assertions="6" />
+      <testcase name="[P1.middleware.002] a global exclude pattern skips the excluded route" classname="middleware" time="0.001434" file="test/middleware.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.middleware.003] global patterns apply to unmatched paths exactly as they match" classname="middleware" time="0.001679" file="test/middleware.test.ts" line="112" assertions="7" />
+      <testcase name="[P1.middleware.010] order: global -&gt; controller -&gt; route -&gt; legacy validator -&gt; handler" classname="middleware" time="0.002169" file="test/middleware.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.middleware.011] a class-level middleware is inherited by a subclass under another prefix" classname="middleware" time="0.001757" file="test/middleware.test.ts" line="112" assertions="9" />
+      <testcase name="[P1.middleware.012] route middlewares of sibling routes on one path do not leak" classname="middleware" time="0.001644" file="test/middleware.test.ts" line="112" assertions="8" />
+      <testcase name="[P1.middleware.013] an undecorated subclass of a decorated guard fails the boot" classname="middleware" time="0.000589" file="test/middleware.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.middleware.014] order: global -&gt; controller -&gt; route -&gt; context contract -&gt; handler" classname="middleware" time="0.001641" file="test/middleware.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.middleware.020] a middleware returning false answers 403 and the handler does not run" classname="middleware" time="0.001667" file="test/middleware.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.middleware.021] a middleware returning a Response short-circuits with it" classname="middleware" time="0.001549" file="test/middleware.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.middleware.022] a header a middleware adds after next() is on the response [cap:middleware.codeAfterNextRuns]" classname="middleware" time="0.001633" file="test/middleware.test.ts" line="101" assertions="4" />
+      <testcase name="[P1.middleware.030] next() inside AsyncLocalStorage.run: the handler and an injected service see the store" classname="middleware" time="0.004136" file="test/middleware.test.ts" line="112" assertions="2" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/context.test.ts" file="test/context.test.ts" tests="30" assertions="75" failures="0" skipped="0" time="0.058679907" hostname="Duffy">
+    <testsuite name="context" file="test/context.test.ts" line="116" tests="30" assertions="75" failures="0" skipped="0" time="0.046" hostname="Duffy">
+      <testcase name="[P1.context.001] getBody parses a JSON body" classname="context" time="0.001946" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.002] getArrayBuffer returns the raw bytes" classname="context" time="0.00351" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.003] getBlob returns a Blob with the body and its type" classname="context" time="0.001461" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.004] getFormData reads a multipart body with a file" classname="context" time="0.001401" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.005] getParseBody reads urlencoded and multipart bodies" classname="context" time="0.001513" file="test/context.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.context.006] invalid JSON in getBody reaches onError as HttpException(400)" classname="context" time="0.00143" file="test/context.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.context.007] the body read in a middleware and again in the handler is the same value" classname="context" time="0.001311" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.010] getQuery returns a value, and an empty string for a present empty key" classname="context" time="0.001394" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.011] getQueryAll returns every value of a repeated key in order" classname="context" time="0.001252" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.012] getAllQueries returns strings for single and arrays for repeated keys" classname="context" time="0.001207" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.013] a missing query is undefined for getQuery, {} for getAllQueries and [] for getQueryAll" classname="context" time="0.001259" file="test/context.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.context.020] headers is a map with lower-cased keys" classname="context" time="0.001163" file="test/context.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.context.021] multiple values of one header are joined with a comma" classname="context" time="0.001144" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.030] getCookie reads a cookie, and false for a missing one" classname="context" time="0.001345" file="test/context.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.context.031] setCookie with path, httpOnly, maxAge and sameSite writes exactly those" classname="context" time="0.001333" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.032] deleteCookie expires the cookie on the given path" classname="context" time="0.00135" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.033] a signed cookie round-trips with the secret" classname="context" time="0.001639" file="test/context.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.context.034] a tampered signed cookie reads as false" classname="context" time="0.001398" file="test/context.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.context.040] setValue in a middleware is visible to getValue in the handler" classname="context" time="0.005596" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.041] values do not leak between 50 concurrent requests" classname="context" time="0.011601" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.045] after next() a global middleware still reads req.method, req.url and the produced res.status [cap:middleware.codeAfterNextRuns]" classname="context" time="0.001758" file="test/context.test.ts" line="101" assertions="2" />
+      <testcase name="[P1.context.050] send(object) answers JSON with application/json" classname="context" time="0.001396" file="test/context.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.context.051] send(string) answers the text as text/plain" classname="context" time="0.001389" file="test/context.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.context.052] send(data, 201) answers with that status" classname="context" time="0.001267" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.053] send(data, { status, headers }) applies both" classname="context" time="0.001135" file="test/context.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.context.054] redirect(url) answers 302 with the location" classname="context" time="0.001176" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.055] html(str) answers the markup as text/html" classname="context" time="0.001326" file="test/context.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.context.060] setResponseHeader replaces an earlier value" classname="context" time="0.001384" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.061] appendResponseHeader keeps both values" classname="context" time="0.001375" file="test/context.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.context.062] getRequestIp returns a loopback address over TCP" classname="context" time="0.001287" file="test/context.test.ts" line="112" assertions="2" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/builtins.test.ts" file="test/builtins.test.ts" tests="11" assertions="46" failures="0" skipped="0" time="0.519017199" hostname="Duffy">
+    <testsuite name="builtins" file="test/builtins.test.ts" line="116" tests="11" assertions="46" failures="0" skipped="0" time="0.513" hostname="Duffy">
+      <testcase name="[P1.builtins.001] a CORS preflight answers 204 with the allowed origin and methods" classname="builtins" time="0.001447" file="test/builtins.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.builtins.002] a simple CORS GET carries access-control-allow-origin" classname="builtins" time="0.001284" file="test/builtins.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.builtins.003] an SSE response behind CORS carries access-control-allow-origin" classname="builtins" time="0.001648" file="test/builtins.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.builtins.004] a global CORS middleware answers a preflight for a path with no OPTIONS route" classname="builtins" time="0.001626" file="test/builtins.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.builtins.005] an origin outside the allow-list gets no access-control-allow-origin" classname="builtins" time="0.001377" file="test/builtins.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.builtins.006] credentials with an allow-list echo the origin and allow credentials" classname="builtins" time="0.001347" file="test/builtins.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.builtins.007] configured allowedHeaders are returned on the preflight" classname="builtins" time="0.001311" file="test/builtins.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.builtins.010] capacity 3 without refill admits three requests and rejects the fourth with 429" classname="builtins" time="0.001669" file="test/builtins.test.ts" line="112" assertions="1" />
+      <testcase name="[P1.builtins.011] x-ratelimit-limit and a decreasing x-ratelimit-remaining are exact" classname="builtins" time="0.001397" file="test/builtins.test.ts" line="112" assertions="11" />
+      <testcase name="[P1.builtins.012] a route excluded from a global rate limiter carries no x-ratelimit headers" classname="builtins" time="0.001499" file="test/builtins.test.ts" line="112" assertions="6" />
+      <testcase name="[P1.builtins.013] a drained bucket admits a request again once a token refills" classname="builtins" time="0.503845" file="test/builtins.test.ts" line="112" assertions="3" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/errors.test.ts" file="test/errors.test.ts" tests="16" assertions="58" failures="0" skipped="0" time="0.034931137" hostname="Duffy">
+    <testsuite name="errors" file="test/errors.test.ts" line="116" tests="16" assertions="58" failures="0" skipped="0" time="0.028" hostname="Duffy">
+      <testcase name="[P1.errors.001] a core HttpException reaches onError and its status and body are answered" classname="errors" time="0.001471" file="test/errors.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.errors.002] an HttpException thrown from a base-class module keeps its status" classname="errors" time="0.001287" file="test/errors.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.errors.003] HttpException init.headers reach the response" classname="errors" time="0.00137" file="test/errors.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.errors.010] a plain Error without onError answers 500 without leaking message or stack" classname="errors" time="0.001313" file="test/errors.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.errors.011] a plain Error with onError returns the handler&apos;s response exactly" classname="errors" time="0.001247" file="test/errors.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.errors.012] an async onError is awaited" classname="errors" time="0.011398" file="test/errors.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.errors.013] an error thrown in a middleware before next() reaches onError" classname="errors" time="0.001378" file="test/errors.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.errors.014] an error thrown in a middleware after next() reaches onError [cap:middleware.codeAfterNextRuns]" classname="errors" time="0.001328" file="test/errors.test.ts" line="101" assertions="1" />
+      <testcase name="[P1.errors.015] an onError that throws answers 500 and the server keeps serving" classname="errors" time="0.00141" file="test/errors.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.errors.020] a handler error is logged once through the ServerLogger, never to console.error" classname="errors" time="0.001494" file="test/errors.test.ts" line="112" assertions="3" />
+      <testcase name="[P1.errors.021] an unmatched request is not passed to onError" classname="errors" time="0.00127" file="test/errors.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.errors.022] the status the adapter logs for a failing request equals the response status" classname="errors" time="0.002645" file="test/errors.test.ts" line="112" assertions="4" />
+      <testcase name="[P1.errors.030] an HttpException from a second copy of core keeps its status" classname="errors" time="0.002008" file="test/errors.test.ts" line="112" assertions="5" />
+      <testcase name="[P1.errors.040] without onError an HttpException(418) answers 418" classname="errors" time="0.001223" file="test/errors.test.ts" line="112" assertions="2" />
+      <testcase name="[P1.errors.041] without onError a route context contract failure answers 400" classname="errors" time="0.001371" file="test/errors.test.ts" line="112" assertions="7" />
+      <testcase name="[P1.errors.042] without onError a legacy (zod) validator failure answers 400" classname="errors" time="0.001836" file="test/errors.test.ts" line="112" assertions="6" />
+    </testsuite>
+  </testsuite>
+</testsuites>
