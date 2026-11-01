@@ -235,6 +235,26 @@ export function plainNotFoundFixture(): Component[] {
   return [RoutingPlainController];
 }
 
+export function rootWildcardFixture(): Component[] {
+  @Controller({ path: '/' })
+  class RoutingRootWildcardController {
+    @Get('/*')
+    public wildcard(context: Ctx) {
+      return context.send({ wildcard: new URL((context.req as { url: string }).url).pathname });
+    }
+  }
+
+  @Controller('/rw')
+  class RoutingRootWildcardSiblingController {
+    @Get('/here')
+    public here(context: Ctx) {
+      return context.send({ handler: 'here' });
+    }
+  }
+
+  return [RoutingRootWildcardController, RoutingRootWildcardSiblingController];
+}
+
 export function inheritanceFixture(): Component[] {
   abstract class RoutingInheritedBase {
     @Get('/base')

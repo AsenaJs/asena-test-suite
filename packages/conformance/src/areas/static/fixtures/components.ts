@@ -141,7 +141,7 @@ function pathOf(context: Ctx): string {
   return new URL((context.req as { url: string }).url).pathname;
 }
 
-export function staticMissFixture(options: { fallback?: boolean } = {}): StaticMissFixture {
+export function staticMissFixture(options: { fallback?: 'site' | 'root' } = {}): StaticMissFixture {
   const probe: StaticMissProbe = { before: {}, notFound: {}, fallback: [], handler: 0 };
 
   @StaticServe({ root: STATIC_ROOT })
@@ -163,6 +163,16 @@ export function staticMissFixture(options: { fallback?: boolean } = {}): StaticM
 
   @Controller('/site')
   class ConformanceSiteFallbackController {
+    @Get('/*')
+    public fallback(context: Ctx) {
+      probe.fallback.push(pathOf(context));
+
+      return context.send({ fallback: true });
+    }
+  }
+
+  @Controller({ path: '/' })
+  class ConformanceRootFallbackController {
     @Get('/*')
     public fallback(context: Ctx) {
       probe.fallback.push(pathOf(context));
@@ -199,9 +209,52 @@ export function staticMissFixture(options: { fallback?: boolean } = {}): StaticM
     ConformanceSiteConfig,
   ];
 
-  if (options.fallback) components.push(ConformanceSiteFallbackController);
+  if (options.fallback === 'site') components.push(ConformanceSiteFallbackController);
+  if (options.fallback === 'root') components.push(ConformanceRootFallbackController);
 
   return { components, probe };
+}
+
+export function spaStaticFixture(): StaticFixture {
+  const probe = newProbe();
+
+  @StaticServe({ root: STATIC_ROOT })
+  class ConformanceSpaServe extends AsenaStaticServeService<Ctx> {
+    public rewriteRequestPath(path: string): string {
+      probe.rewrites.push(path);
+
+      return path;
+    }
+
+    public onFound(path: string): void {
+      probe.found.push(path);
+    }
+
+    public onNotFound(path: string): void {
+      probe.notFound.push(path);
+    }
+  }
+
+  @Controller({ path: '/' })
+  class ConformanceSpaController {
+    @Get({ path: '/*', staticServe: ConformanceSpaServe })
+    public serve(context: Ctx) {
+      probe.handler++;
+
+      return context.send({ fellThrough: true });
+    }
+  }
+
+  @Config()
+  class ConformanceSpaConfig implements AsenaConfig {
+    public onNotFound(context: Ctx, request: { path: string }) {
+      probe.configNotFound.push(request.path);
+
+      return context.send({ shaped: true }, 404);
+    }
+  }
+
+  return { components: [ConformanceSpaServe, ConformanceSpaController, ConformanceSpaConfig], probe };
 }
 
 export function pageFixture(): Component[] {

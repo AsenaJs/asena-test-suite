@@ -9,6 +9,7 @@ import {
   PAGE_MARKER,
   pageFixture,
   SIBLING_SECRET,
+  spaStaticFixture,
   STATIC_ROOT,
   staticFixture,
   staticMissFixture,
@@ -258,7 +259,7 @@ export function register(): void {
       'P1.static.014',
       'a static miss ends in the config onNotFound and never falls through to a matching wildcard route',
       async () => {
-        const fixture = staticMissFixture({ fallback: true });
+        const fixture = staticMissFixture({ fallback: 'site' });
         await using app = await bootApp({ components: fixture.components });
 
         const missing = await app.get('/site/assets/missing.txt');
@@ -304,6 +305,69 @@ export function register(): void {
         expect(fixture.probe.handler).toBe(0);
       },
       { requires: ['static.nulPathIsNotFound'] },
+    );
+
+    scenario(
+      'P1.static.016',
+      'a static /* route on a root controller serves existing files and runs its miss path',
+      async () => {
+        const fixture = spaStaticFixture();
+        await using app = await bootApp({ components: fixture.components });
+
+        const hello = await app.get('/hello.txt');
+
+        expect(hello.status).toBe(200);
+        expect(hello.text()).toBe(await fileText('hello.txt'));
+
+        const nested = await app.get('/sub/file.txt');
+
+        expect(nested.status).toBe(200);
+        expect(nested.text()).toBe(await fileText('sub/file.txt'));
+
+        const missing = await app.get('/missing.txt');
+
+        expect(missing.status).toBe(404);
+        expect(missing.json()).toEqual({ shaped: true });
+        expect(fixture.probe.rewrites).toEqual(['/hello.txt', '/sub/file.txt', '/missing.txt']);
+        expect(
+          fixture.probe.found.map((path) => path.endsWith('/hello.txt') || path.endsWith('/sub/file.txt')),
+        ).toEqual([true, true]);
+        expect(fixture.probe.notFound.map((path) => path.endsWith('/missing.txt'))).toEqual([true]);
+        expect(fixture.probe.configNotFound).toEqual(['/missing.txt']);
+        expect(fixture.probe.handler).toBe(0);
+      },
+      { requires: ['optional.notFoundHook', 'routing.userRootWildcardAnswers'] },
+    );
+
+    scenario(
+      'P1.static.017',
+      'a static miss never falls through to a top-level /* route, which still answers other paths',
+      async () => {
+        const fixture = staticMissFixture({ fallback: 'root' });
+        await using app = await bootApp({ components: fixture.components });
+
+        const missing = await app.get('/site/assets/missing.txt');
+
+        expect(missing.status).toBe(404);
+        expect(missing.json()).toEqual({ notFound: true });
+        expect(Object.keys(fixture.probe.notFound)).toEqual(['/site/assets/missing.txt']);
+        expect(fixture.probe.fallback).toEqual([]);
+
+        const present = await app.get('/site/assets/hello.txt');
+
+        expect(present.status).toBe(200);
+        expect(present.text()).toBe(await fileText('hello.txt'));
+
+        const outside = await app.get('/other');
+
+        expect(outside.status).toBe(200);
+        expect(outside.json()).toEqual({ fallback: true });
+        expect(fixture.probe.fallback).toEqual(['/other']);
+        expect(fixture.probe.handler).toBe(0);
+      },
+      {
+        requires: ['optional.notFoundHook', 'static.missDoesNotFallThrough', 'routing.userRootWildcardAnswers'],
+      },
     );
 
     scenario('P1.static.020', 'a @Page route serves the HTML page', async () => {

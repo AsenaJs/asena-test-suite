@@ -132,7 +132,7 @@ your adapter really does not provide the feature; its scenarios are then reporte
 
 | Flag | Why it is optional (core 0.12) | Scenarios it gates |
 |---|---|---|
-| `optional.notFoundHook` | `AsenaAdapter.onNotFound?` (`lib/adapter/AsenaAdapter.ts`) | P1.routing.050-051, P1.static.008, P1.static.013-014 |
+| `optional.notFoundHook` | `AsenaAdapter.onNotFound?` (`lib/adapter/AsenaAdapter.ts`) | P1.routing.050-051, P1.static.008, P1.static.013-014, P1.static.016-017 |
 | `optional.unixSocket` | `AsenaStartOptions.unix?` (`lib/adapter/types/ServeOptions.ts`; adapters may ignore start options they do not support) | P1.lifecycle.004, P1.harness.020 |
 | `optional.routePattern` | `AsenaContext.routePattern?` (`lib/adapter/AsenaContext.ts`) | P1.routing.070-071, P1.static.013 |
 | `optional.requestIp` | `AsenaContext.getRequestIp?` (`lib/adapter/AsenaContext.ts`) | P1.context.062 |

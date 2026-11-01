@@ -27,6 +27,7 @@ export const capabilities: Readonly<Record<CapabilityFlag, Readonly<CapabilityEn
   'static.missKeepsRoutePattern': { kind: 'divergence', convergence: 'WP-56' },
   'static.missDoesNotFallThrough': { kind: 'divergence', convergence: 'WP-63' },
   'static.nulPathIsNotFound': { kind: 'divergence', convergence: 'WP-64' },
+  'routing.userRootWildcardAnswers': { kind: 'divergence', convergence: 'WP-65' },
   'optional.notFoundHook': {
     kind: 'optional',
     description: 'AsenaAdapter.onNotFound is optional; without it a config onNotFound hook is never called.',

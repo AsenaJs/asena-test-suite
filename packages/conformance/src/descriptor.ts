@@ -44,7 +44,8 @@ export type DivergenceFlag =
   | 'static.encodedSlashInRootIsServed'
   | 'static.missKeepsRoutePattern'
   | 'static.missDoesNotFallThrough'
-  | 'static.nulPathIsNotFound';
+  | 'static.nulPathIsNotFound'
+  | 'routing.userRootWildcardAnswers';
 
 export type CapabilityFlag = OptionalFlag | DivergenceFlag;
 
