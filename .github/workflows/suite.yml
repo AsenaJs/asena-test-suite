@@ -119,7 +119,9 @@ jobs:
           { echo '### pack:local'; echo '```'; cat pack-local.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Part 1
-        run: bun run test:p1 --reporter=junit --reporter-outfile="$PWD/out/p1-${{ matrix.adapter }}.xml"
+        run: |
+          mkdir -p out
+          bun run test:p1 --reporter=junit --reporter-outfile="$PWD/out/p1-${{ matrix.adapter }}.xml"
 
       - name: Upload junit
         if: always()
