@@ -301,6 +301,7 @@ export function register(): void {
         expect(seen).toEqual(
           NUL_PATHS.map((target): [string, number, string] => [target, 404, JSON.stringify(NOT_FOUND)]),
         );
+        expect(fixture.probe.notFound).toHaveLength(NUL_PATHS.length);
         expect(fixture.probe.found).toEqual([]);
         expect(fixture.probe.handler).toBe(0);
       },
