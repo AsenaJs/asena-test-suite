@@ -127,7 +127,6 @@ export function register(): void {
         expect(present.text()).toBe(await fileText('hello.txt'));
         expect(fixture.probe.handler).toBe(1);
       },
-      { requires: ['static.overrideNotFoundContinuesToHandler'] },
     );
 
     scenario('P1.static.007', 'an inherited static route serves under the subclass prefix', async () => {
@@ -195,7 +194,6 @@ export function register(): void {
           ...ESCAPING_TRAVERSAL.map((target): [string, number] => [target, 403]),
         ]);
       },
-      { requires: ['static.encodedPathIsDecodedAndChecked'] },
     );
 
     scenario(
@@ -228,7 +226,6 @@ export function register(): void {
         expect(fixture.probe.notFound.map((path) => path.endsWith('/sub/missing.txt'))).toEqual([true]);
         expect(fixture.probe.handler).toBe(0);
       },
-      { requires: ['static.encodedSlashInRootIsServed'] },
     );
 
     scenario(
@@ -252,7 +249,7 @@ export function register(): void {
         expect(fixture.probe.before['/site/assets/hello.txt']).toBe('/site/assets/:file');
         expect(fixture.probe.handler).toBe(0);
       },
-      { requires: ['optional.routePattern', 'optional.notFoundHook', 'static.missKeepsRoutePattern'] },
+      { requires: ['optional.routePattern', 'optional.notFoundHook'] },
     );
 
     scenario(
@@ -281,32 +278,27 @@ export function register(): void {
         expect(fixture.probe.fallback).toEqual(['/site/other']);
         expect(fixture.probe.handler).toBe(0);
       },
-      { requires: ['optional.notFoundHook', 'static.missDoesNotFallThrough'] },
+      { requires: ['optional.notFoundHook'] },
     );
 
-    scenario(
-      'P1.static.015',
-      'a static path that decodes to a NUL byte ends as not found',
-      async () => {
-        const fixture = staticFixture();
-        await using app = await bootApp({ components: fixture.components });
-        const seen: [string, number, string][] = [];
+    scenario('P1.static.015', 'a static path that decodes to a NUL byte ends as not found', async () => {
+      const fixture = staticFixture();
+      await using app = await bootApp({ components: fixture.components });
+      const seen: [string, number, string][] = [];
 
-        for (const target of NUL_PATHS) {
-          const response = await rawGet(app.port, target);
+      for (const target of NUL_PATHS) {
+        const response = await rawGet(app.port, target);
 
-          seen.push([target, response.status, response.body]);
-        }
+        seen.push([target, response.status, response.body]);
+      }
 
-        expect(seen).toEqual(
-          NUL_PATHS.map((target): [string, number, string] => [target, 404, JSON.stringify(NOT_FOUND)]),
-        );
-        expect(fixture.probe.notFound).toHaveLength(NUL_PATHS.length);
-        expect(fixture.probe.found).toEqual([]);
-        expect(fixture.probe.handler).toBe(0);
-      },
-      { requires: ['static.nulPathIsNotFound'] },
-    );
+      expect(seen).toEqual(
+        NUL_PATHS.map((target): [string, number, string] => [target, 404, JSON.stringify(NOT_FOUND)]),
+      );
+      expect(fixture.probe.notFound).toHaveLength(NUL_PATHS.length);
+      expect(fixture.probe.found).toEqual([]);
+      expect(fixture.probe.handler).toBe(0);
+    });
 
     scenario(
       'P1.static.016',
@@ -337,7 +329,7 @@ export function register(): void {
         expect(fixture.probe.configNotFound).toEqual(['/missing.txt']);
         expect(fixture.probe.handler).toBe(0);
       },
-      { requires: ['optional.notFoundHook', 'routing.userRootWildcardAnswers'] },
+      { requires: ['optional.notFoundHook'] },
     );
 
     scenario(
@@ -366,9 +358,7 @@ export function register(): void {
         expect(fixture.probe.fallback).toEqual(['/other']);
         expect(fixture.probe.handler).toBe(0);
       },
-      {
-        requires: ['optional.notFoundHook', 'static.missDoesNotFallThrough', 'routing.userRootWildcardAnswers'],
-      },
+      { requires: ['optional.notFoundHook'] },
     );
 
     scenario('P1.static.020', 'a @Page route serves the HTML page', async () => {

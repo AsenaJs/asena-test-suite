@@ -121,20 +121,15 @@ export function register(): void {
       expect(form.json()).toEqual({ title: { kind: 'string', value: 'doc' }, upload: UPLOAD });
     });
 
-    scenario(
-      'P1.context.006',
-      'invalid JSON in getBody reaches onError as HttpException(400)',
-      async () => {
-        const fixture = invalidJsonFixture();
-        await using app = await bootApp({ components: fixture.components });
-        const response = await app.post('/ctx-body/invalid-json', { headers: JSON_HEADERS, body: '{"a":' });
+    scenario('P1.context.006', 'invalid JSON in getBody reaches onError as HttpException(400)', async () => {
+      const fixture = invalidJsonFixture();
+      await using app = await bootApp({ components: fixture.components });
+      const response = await app.post('/ctx-body/invalid-json', { headers: JSON_HEADERS, body: '{"a":' });
 
-        expect(fixture.calls.handlerReturned).toBe(0);
-        expect(response.json()).toEqual({ httpException: true, status: 400 });
-        expect(response.status).toBe(400);
-      },
-      { requires: ['context.invalidJsonIsBadRequest'] },
-    );
+      expect(fixture.calls.handlerReturned).toBe(0);
+      expect(response.json()).toEqual({ httpException: true, status: 400 });
+      expect(response.status).toBe(400);
+    });
 
     scenario('P1.context.007', 'the body read in a middleware and again in the handler is the same value', async () => {
       await using app = await bootApp({ components: bodyFixture() });
@@ -159,7 +154,6 @@ export function register(): void {
 
         expect(seen).toEqual(EMPTY_BODIES.map(([label]) => [label, 200, { first: {}, second: {} }]));
       },
-      { requires: ['context.emptyBodyIsEmptyObject'] },
     );
 
     scenario('P1.context.010', 'getQuery returns a value, and an empty string for a present empty key', async () => {
@@ -201,7 +195,6 @@ export function register(): void {
         expect(body.every).toEqual({});
         expect(body.all).toEqual([]);
       },
-      { requires: ['context.absentValuesMatchDeclaredTypes'] },
     );
 
     scenario('P1.context.020', 'headers is a map with lower-cased keys', async () => {
@@ -229,22 +222,17 @@ export function register(): void {
       expect(response.json<Record<string, string>>()['x-multi']).toBe('a, b');
     });
 
-    scenario(
-      'P1.context.030',
-      'getCookie reads a cookie, and false for a missing one',
-      async () => {
-        await using app = await bootApp({ components: cookieSurfaceFixture() });
-        const response = await app.get('/ctx-cookie/read', { headers: { cookie: 'session=abc; other=1' } });
+    scenario('P1.context.030', 'getCookie reads a cookie, and false for a missing one', async () => {
+      await using app = await bootApp({ components: cookieSurfaceFixture() });
+      const response = await app.get('/ctx-cookie/read', { headers: { cookie: 'session=abc; other=1' } });
 
-        expect(response.status).toBe(200);
+      expect(response.status).toBe(200);
 
-        const body = response.json<{ session: unknown; missing: unknown }>();
+      const body = response.json<{ session: unknown; missing: unknown }>();
 
-        expect(body.session).toBe('abc');
-        expect(body.missing).toBe(false);
-      },
-      { requires: ['context.absentValuesMatchDeclaredTypes'] },
-    );
+      expect(body.session).toBe('abc');
+      expect(body.missing).toBe(false);
+    });
 
     scenario('P1.context.031', 'setCookie with path, httpOnly, maxAge and sameSite writes exactly those', async () => {
       await using app = await bootApp({ components: cookieSurfaceFixture() });
@@ -345,7 +333,6 @@ export function register(): void {
           { method: 'GET', url: `${app.baseUrl}/ctx-after/nowhere`, status: 404 },
         ]);
       },
-      { requires: ['middleware.codeAfterNextRuns'] },
     );
 
     scenario('P1.context.050', 'send(object) answers JSON with application/json', async () => {

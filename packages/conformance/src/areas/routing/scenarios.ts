@@ -225,22 +225,17 @@ export function register(): void {
       expect(byId.json()).toEqual({ handler: 'base.byId', id: '7' });
     });
 
-    scenario(
-      'P1.routing.040',
-      'a trailing slash /x/ answers like /x on an API route',
-      async () => {
-        await using app = await bootApp({ components: trailingSlashFixture() });
-        const plain = await app.get('/slash/x');
+    scenario('P1.routing.040', 'a trailing slash /x/ answers like /x on an API route', async () => {
+      await using app = await bootApp({ components: trailingSlashFixture() });
+      const plain = await app.get('/slash/x');
 
-        expect(plain.status).toBe(200);
+      expect(plain.status).toBe(200);
 
-        const slashed = await app.get('/slash/x/');
+      const slashed = await app.get('/slash/x/');
 
-        expect(slashed.status).toBe(200);
-        expect(slashed.json()).toEqual(plain.json());
-      },
-      { requires: ['routing.trailingSlashAlias'] },
-    );
+      expect(slashed.status).toBe(200);
+      expect(slashed.json()).toEqual(plain.json());
+    });
 
     scenario(
       'P1.routing.050',
@@ -297,7 +292,6 @@ export function register(): void {
         expect(owned.status).toBe(200);
         expect(owned.json()).toEqual({ handler: 'here' });
       },
-      { requires: ['routing.userRootWildcardAnswers'] },
     );
 
     scenario(
@@ -350,7 +344,7 @@ export function register(): void {
         expect(response.json()).toEqual({ id: '42' });
         expect(fixture.after['/items/42']).toBe('/items/:id');
       },
-      { requires: ['optional.routePattern', 'middleware.codeAfterNextRuns'] },
+      { requires: ['optional.routePattern'] },
     );
 
     scenario(
@@ -365,7 +359,7 @@ export function register(): void {
         expect('/nothing/here' in fixture.before).toBe(true);
         expect(fixture.before['/nothing/here']).toBeUndefined();
       },
-      { requires: ['optional.routePattern', 'routing.unmatchedRoutePatternUnset'] },
+      { requires: ['optional.routePattern'] },
     );
   });
 }

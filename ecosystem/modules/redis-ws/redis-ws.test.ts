@@ -24,7 +24,6 @@ await assertReachable('redis');
 
 const UNREACHABLE_REDIS = 'redis://localhost:1';
 const redis = { services: ['redis' as const] };
-const startAwaits = { ...redis, requires: ['ws.startAwaitsTransportInit' as const] };
 
 function redisUrl(): string {
   return process.env.ASENA_SUITE_REDIS_URL ?? '';
@@ -262,7 +261,7 @@ scenario(
     expect(initPendingAfterStart).toBe(false);
     expect(bootError).toBeInstanceOf(Error);
   },
-  startAwaits,
+  redis,
 );
 
 scenario(
@@ -284,7 +283,7 @@ scenario(
       await pods.stopAll();
     }
   },
-  startAwaits,
+  redis,
 );
 
 scenario(

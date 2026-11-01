@@ -75,7 +75,6 @@ scenario(
       ),
     ).toEqual(statuses);
   },
-  { requires: ['middleware.codeAfterNextRuns'] },
 );
 
 scenario('P2.otel.004', 'controller and service INTERNAL spans are parented to the SERVER span', async () => {

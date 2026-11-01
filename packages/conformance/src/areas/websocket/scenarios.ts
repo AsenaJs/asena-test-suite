@@ -401,7 +401,6 @@ export function register(): void {
           await app.stop();
         }
       },
-      { requires: ['ws.startAwaitsTransportInit'] },
     );
 
     scenario(
@@ -436,7 +435,6 @@ export function register(): void {
         expect(bootError).toBeInstanceOf(Error);
         expect((bootError as Error).message).toContain(TRANSPORT_INIT_FAILURE);
       },
-      { requires: ['ws.startAwaitsTransportInit'] },
     );
 
     scenario('P1.websocket.042', 'service.to(room) publishes through the configured transport', async () => {
