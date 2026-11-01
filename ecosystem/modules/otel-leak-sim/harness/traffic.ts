@@ -82,9 +82,12 @@ async function safeFetch(url: string, init?: RequestInit): Promise<void> {
 function normalUsers(baseUrl: string, n: number, tag: string): Persona {
   const tasks: Task[] = [];
   const createdIds: string[] = [];
+  const pickId = (existing: boolean) =>
+    existing && createdIds.length ? createdIds[Math.floor(Math.random() * createdIds.length)] : crypto.randomUUID();
 
   for (let i = 0; i < n; i++) {
     const roll = i % 6;
+    const cycle = Math.floor(i / 6);
 
     if (roll === 0) {
       tasks.push(() => safeFetch(`${baseUrl}/health`));
@@ -125,21 +128,26 @@ function normalUsers(baseUrl: string, n: number, tag: string): Persona {
         }),
       );
     } else if (roll === 4) {
-      const id = createdIds.length && i % 2 === 0 ? createdIds[i % createdIds.length] : crypto.randomUUID();
+      const existing = cycle % 2 === 0;
 
-      tasks.push(() => safeFetch(`${baseUrl}/api/users/${id}`));
+      tasks.push(() => safeFetch(`${baseUrl}/api/users/${pickId(existing)}`));
+    } else if (cycle % 2 === 0) {
+      tasks.push(() =>
+        safeFetch(`${baseUrl}/api/users/${pickId(true)}`, {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ name: `upd-${rand()}` }),
+        }),
+      );
     } else {
-      const id = crypto.randomUUID();
-      const init: RequestInit =
-        i % 2 === 0
-          ? {
-              method: 'PUT',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({ name: `upd-${rand()}` }),
-            }
-          : { method: 'DELETE' };
+      tasks.push(() => {
+        const id = pickId(true);
+        const index = createdIds.indexOf(id);
 
-      tasks.push(() => safeFetch(`${baseUrl}/api/users/${id}`, init));
+        if (index !== -1) createdIds.splice(index, 1);
+
+        return safeFetch(`${baseUrl}/api/users/${id}`, { method: 'DELETE' });
+      });
     }
   }
 
