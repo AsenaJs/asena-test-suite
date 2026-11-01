@@ -41,7 +41,8 @@ export type DivergenceFlag =
   | 'streaming.sseWriterStateIsLive'
   | 'static.overrideNotFoundContinuesToHandler'
   | 'static.encodedPathIsDecodedAndChecked'
-  | 'static.encodedSlashInRootIsServed';
+  | 'static.encodedSlashInRootIsServed'
+  | 'static.missKeepsRoutePattern';
 
 export type CapabilityFlag = OptionalFlag | DivergenceFlag;
 

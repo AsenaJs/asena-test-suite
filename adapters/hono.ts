@@ -49,6 +49,7 @@ export const divergences: Partial<Record<DivergenceFlag, false>> = {
   'static.overrideNotFoundContinuesToHandler': false,
   'static.encodedPathIsDecodedAndChecked': false,
   'static.encodedSlashInRootIsServed': false,
+  'static.missKeepsRoutePattern': false,
 };
 
 export default descriptor;

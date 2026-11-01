@@ -125,6 +125,85 @@ export function staticFixture(options: StaticFixtureOptions = {}): StaticFixture
   return { components, probe };
 }
 
+export interface StaticMissProbe {
+  before: Record<string, string | undefined>;
+  notFound: Record<string, string | undefined>;
+  fallback: string[];
+  handler: number;
+}
+
+export interface StaticMissFixture {
+  components: Component[];
+  probe: StaticMissProbe;
+}
+
+function pathOf(context: Ctx): string {
+  return new URL((context.req as { url: string }).url).pathname;
+}
+
+export function staticMissFixture(options: { fallback?: boolean } = {}): StaticMissFixture {
+  const probe: StaticMissProbe = { before: {}, notFound: {}, fallback: [], handler: 0 };
+
+  @StaticServe({ root: STATIC_ROOT })
+  class ConformanceSiteAssetsServe extends AsenaStaticServeService<Ctx> {
+    public rewriteRequestPath(path: string): string {
+      return stripPrefix(path, '/site/assets');
+    }
+  }
+
+  @Controller('/site/assets')
+  class ConformanceSiteAssetsController {
+    @Get({ path: '/:file', staticServe: ConformanceSiteAssetsServe })
+    public serve(context: Ctx) {
+      probe.handler++;
+
+      return context.send({ assetsHandler: true });
+    }
+  }
+
+  @Controller('/site')
+  class ConformanceSiteFallbackController {
+    @Get('/*')
+    public fallback(context: Ctx) {
+      probe.fallback.push(pathOf(context));
+
+      return context.send({ fallback: true });
+    }
+  }
+
+  @Middleware()
+  class ConformanceSitePatternMiddleware extends AsenaMiddlewareService {
+    public async handle(context: Ctx, next: AsenaNextHandler) {
+      probe.before[pathOf(context)] = context.routePattern;
+      await next();
+    }
+  }
+
+  @Config()
+  class ConformanceSiteConfig implements AsenaConfig {
+    public globalMiddlewares() {
+      return [ConformanceSitePatternMiddleware];
+    }
+
+    public onNotFound(context: Ctx, request: { path: string }) {
+      probe.notFound[request.path] = context.routePattern;
+
+      return context.send({ notFound: true }, 404);
+    }
+  }
+
+  const components: Component[] = [
+    ConformanceSiteAssetsServe,
+    ConformanceSiteAssetsController,
+    ConformanceSitePatternMiddleware,
+    ConformanceSiteConfig,
+  ];
+
+  if (options.fallback) components.push(ConformanceSiteFallbackController);
+
+  return { components, probe };
+}
+
 export function pageFixture(): Component[] {
   @FrontendController('/ui')
   class ConformanceUiFrontend {

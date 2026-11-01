@@ -11,6 +11,7 @@ import {
   SIBLING_SECRET,
   STATIC_ROOT,
   staticFixture,
+  staticMissFixture,
 } from './fixtures/components.ts';
 import { rawGet } from './raw.ts';
 
@@ -225,6 +226,30 @@ export function register(): void {
         expect(fixture.probe.handler).toBe(0);
       },
       { requires: ['static.encodedSlashInRootIsServed'] },
+    );
+
+    scenario(
+      'P1.static.013',
+      'on a static miss a global middleware and the config onNotFound read the static route pattern',
+      async () => {
+        const fixture = staticMissFixture();
+        await using app = await bootApp({ components: fixture.components });
+
+        const missing = await app.get('/site/assets/missing.txt');
+
+        expect(missing.status).toBe(404);
+        expect(missing.json()).toEqual({ notFound: true });
+        expect(fixture.probe.before).toEqual({ '/site/assets/missing.txt': '/site/assets/:file' });
+        expect(fixture.probe.notFound).toEqual({ '/site/assets/missing.txt': '/site/assets/:file' });
+
+        const present = await app.get('/site/assets/hello.txt');
+
+        expect(present.status).toBe(200);
+        expect(present.text()).toBe(await fileText('hello.txt'));
+        expect(fixture.probe.before['/site/assets/hello.txt']).toBe('/site/assets/:file');
+        expect(fixture.probe.handler).toBe(0);
+      },
+      { requires: ['optional.routePattern', 'optional.notFoundHook', 'static.missKeepsRoutePattern'] },
     );
 
     scenario('P1.static.020', 'a @Page route serves the HTML page', async () => {
