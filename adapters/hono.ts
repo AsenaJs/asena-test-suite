@@ -41,6 +41,8 @@ export const divergences: Partial<Record<DivergenceFlag, false>> = {
   'routing.trailingSlashAlias': false,
   'ws.startAwaitsTransportInit': false,
   'routing.unmatchedRoutePatternUnset': false,
+  'context.absentValuesMatchDeclaredTypes': false,
+  'context.invalidJsonIsBadRequest': false,
 };
 
 export default descriptor;

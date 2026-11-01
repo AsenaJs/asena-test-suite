@@ -16,6 +16,8 @@ export const capabilities: Readonly<Record<CapabilityFlag, Readonly<CapabilityEn
   'ws.startAwaitsTransportInit': { kind: 'divergence', convergence: 'WP-50' },
   'middleware.codeAfterNextRuns': { kind: 'divergence', convergence: 'WP-55' },
   'routing.unmatchedRoutePatternUnset': { kind: 'divergence', convergence: 'WP-56' },
+  'context.absentValuesMatchDeclaredTypes': { kind: 'divergence', convergence: 'WP-57' },
+  'context.invalidJsonIsBadRequest': { kind: 'divergence', convergence: 'WP-58' },
   'optional.notFoundHook': {
     kind: 'optional',
     description: 'AsenaAdapter.onNotFound is optional; without it a config onNotFound hook is never called.',

@@ -33,7 +33,9 @@ export type DivergenceFlag =
   | 'routing.trailingSlashAlias'
   | 'ws.startAwaitsTransportInit'
   | 'middleware.codeAfterNextRuns'
-  | 'routing.unmatchedRoutePatternUnset';
+  | 'routing.unmatchedRoutePatternUnset'
+  | 'context.absentValuesMatchDeclaredTypes'
+  | 'context.invalidJsonIsBadRequest';
 
 export type CapabilityFlag = OptionalFlag | DivergenceFlag;
 
