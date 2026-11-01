@@ -43,7 +43,8 @@ export type DivergenceFlag =
   | 'static.encodedPathIsDecodedAndChecked'
   | 'static.encodedSlashInRootIsServed'
   | 'static.missKeepsRoutePattern'
-  | 'static.missDoesNotFallThrough';
+  | 'static.missDoesNotFallThrough'
+  | 'static.nulPathIsNotFound';
 
 export type CapabilityFlag = OptionalFlag | DivergenceFlag;
 

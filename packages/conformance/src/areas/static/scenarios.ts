@@ -36,6 +36,8 @@ const MALFORMED = ['/static/%zz.txt', '/static/100%.txt', '/static/%e0%a4%a.txt'
 
 const IN_ROOT_ENCODED_SLASH = ['/static/sub%2Ffile.txt', '/static/sub%2ffile.txt'];
 
+const NUL_PATHS = ['/static/a%00.txt', '/static/hello.txt%00'];
+
 function fileText(name: string): Promise<string> {
   return Bun.file(join(STATIC_ROOT, name)).text();
 }
@@ -279,6 +281,29 @@ export function register(): void {
         expect(fixture.probe.handler).toBe(0);
       },
       { requires: ['optional.notFoundHook', 'static.missDoesNotFallThrough'] },
+    );
+
+    scenario(
+      'P1.static.015',
+      'a static path that decodes to a NUL byte ends as not found',
+      async () => {
+        const fixture = staticFixture();
+        await using app = await bootApp({ components: fixture.components });
+        const seen: [string, number, string][] = [];
+
+        for (const target of NUL_PATHS) {
+          const response = await rawGet(app.port, target);
+
+          seen.push([target, response.status, response.body]);
+        }
+
+        expect(seen).toEqual(
+          NUL_PATHS.map((target): [string, number, string] => [target, 404, JSON.stringify(NOT_FOUND)]),
+        );
+        expect(fixture.probe.found).toEqual([]);
+        expect(fixture.probe.handler).toBe(0);
+      },
+      { requires: ['static.nulPathIsNotFound'] },
     );
 
     scenario('P1.static.020', 'a @Page route serves the HTML page', async () => {

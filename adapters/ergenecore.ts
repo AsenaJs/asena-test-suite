@@ -35,6 +35,7 @@ const descriptor: AdapterDescriptor = {
 
 export const divergences: Partial<Record<DivergenceFlag, false>> = {
   'middleware.codeAfterNextRuns': false,
+  'static.nulPathIsNotFound': false,
 };
 
 export default descriptor;
