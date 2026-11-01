@@ -20,15 +20,31 @@ if (tsc.exitCode !== 0) {
   process.exit(1);
 }
 
-// tsc applies rewriteRelativeImportExtensions to .js output only; declarations keep the .ts specifiers.
+// tsc leaves .ts specifiers in declarations and in dynamic import() calls inside function bodies.
 const tsSpecifier = /((?:\bfrom|\bimport|\bimport\s*\()\s*)(['"])(\.{1,2}\/[^'"]*?)(?<!\.d)\.([mc]?)ts\2/g;
 
-for (const rel of new Bun.Glob('**/*.d.ts').scanSync({ cwd: distDir })) {
+for (const rel of new Bun.Glob('**/*.{js,d.ts}').scanSync({ cwd: distDir })) {
   const file = join(distDir, rel);
   const text = await Bun.file(file).text();
   const rewritten = text.replace(tsSpecifier, '$1$2$3.$4js$2');
 
   if (rewritten !== text) await Bun.write(file, rewritten);
+}
+
+const leftover = /['"]\.{1,2}\/[^'"]*(?<!\.d)\.[mc]?ts['"]/;
+const unresolved: string[] = [];
+
+for (const rel of new Bun.Glob('**/*.{js,d.ts}').scanSync({ cwd: distDir })) {
+  const lines = (await Bun.file(join(distDir, rel)).text()).split('\n');
+
+  lines.forEach((line, index) => {
+    if (leftover.test(line)) unresolved.push(`${rel}:${index + 1}: ${line.trim()}`);
+  });
+}
+
+if (unresolved.length > 0) {
+  console.error(`build: relative .ts specifiers left in dist/:\n${unresolved.join('\n')}`);
+  process.exit(1);
 }
 
 let copied = 0;
