@@ -172,7 +172,8 @@ registers the subclass with `@Middleware()`.
 
 - Every scenario is always registered, so the collected ID set is the same for every adapter.
 - A skip always carries its reason in the title: `[cap:optional.*]` for a flag you set to `false`, `[cap:member:*]` for a missing
-  descriptor member. Anything else is a pass or a failure.
+  descriptor member, `[svc:<name>]` for a missing external service (no scenario in this package declares one). Anything else
+  is a pass or a failure.
 - There is no way to declare an expected failure. A scenario your adapter does not satisfy fails, and the failure message is the
   assertion that did not hold.
 - `P1.resolution.010` fails with `NOT-CONFORMANT: descriptor declares divergence flags or unknown keys: ...` when the descriptor

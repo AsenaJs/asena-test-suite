@@ -42,7 +42,7 @@ bun run validate                              # every validator check, both adap
 
 `ASENA_ADAPTER` accepts `ergenecore`, `hono` or a path to a module whose default export is an `AdapterDescriptor`. The workspace
 `bunfig.toml` files preload `tools/select-adapter.ts`, which loads the descriptor and hands it to the runtime; without
-`ASENA_ADAPTER` nothing is selected and the scenarios fail with a "no descriptor" error. Inside the suite the package specifiers
+`ASENA_ADAPTER` nothing is selected and the scenarios fail with `No adapter descriptor is set. ...`. Inside the suite the package specifiers
 resolve to `packages/conformance/src` through tsconfig `paths`, so no build is needed to run tests. `bun run build` compiles the
 package to `dist/` (tsc with both decorator flags, then copies the non-TypeScript fixtures).
 
