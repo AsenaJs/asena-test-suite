@@ -40,6 +40,7 @@ const descriptor: AdapterDescriptor = {
 export const divergences: Partial<Record<DivergenceFlag, false>> = {
   'routing.trailingSlashAlias': false,
   'ws.startAwaitsTransportInit': false,
+  'routing.unmatchedRoutePatternUnset': false,
 };
 
 export default descriptor;

@@ -29,7 +29,11 @@ export interface ConformanceRateLimiterOptions {
 }
 
 /** Maintainer bookkeeping for first-party adapters. Not part of AdapterDescriptor; not exported from the package index. */
-export type DivergenceFlag = 'routing.trailingSlashAlias' | 'ws.startAwaitsTransportInit';
+export type DivergenceFlag =
+  | 'routing.trailingSlashAlias'
+  | 'ws.startAwaitsTransportInit'
+  | 'middleware.codeAfterNextRuns'
+  | 'routing.unmatchedRoutePatternUnset';
 
 export type CapabilityFlag = OptionalFlag | DivergenceFlag;
 

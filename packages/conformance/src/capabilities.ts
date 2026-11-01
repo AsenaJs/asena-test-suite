@@ -14,6 +14,8 @@ export interface CapabilityEntry {
 export const capabilities: Readonly<Record<CapabilityFlag, Readonly<CapabilityEntry>>> = Object.freeze({
   'routing.trailingSlashAlias': { kind: 'divergence', convergence: 'WP-51' },
   'ws.startAwaitsTransportInit': { kind: 'divergence', convergence: 'WP-50' },
+  'middleware.codeAfterNextRuns': { kind: 'divergence', convergence: 'WP-55' },
+  'routing.unmatchedRoutePatternUnset': { kind: 'divergence', convergence: 'WP-56' },
   'optional.notFoundHook': {
     kind: 'optional',
     description: 'AsenaAdapter.onNotFound is optional; without it a config onNotFound hook is never called.',

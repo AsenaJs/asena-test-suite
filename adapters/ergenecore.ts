@@ -33,6 +33,8 @@ const descriptor: AdapterDescriptor = {
   },
 };
 
-export const divergences: Partial<Record<DivergenceFlag, false>> = {};
+export const divergences: Partial<Record<DivergenceFlag, false>> = {
+  'middleware.codeAfterNextRuns': false,
+};
 
 export default descriptor;
