@@ -1,0 +1,5 @@
+{
+  "name": "ecosystem",
+  "private": true,
+  "dependencies": { "@asenajs/adapter-conformance": "workspace:*", "@asenajs/asena-logger": "^3.0.1" }
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="3" assertions="3" failures="1" skipped="0" time="0.1">
+  <testsuite name="out/entry/b.entry.test.ts" file="out/entry/b.entry.test.ts" tests="3" assertions="3" failures="1" skipped="0" time="0.01" hostname="h">
+    <testsuite name="routing" file="out/entry/b.entry.test.ts" line="1" tests="1" assertions="1" failures="1" skipped="0" time="0" hostname="h">
+      <testcase name="[P1.routing.040] trailing slash alias" classname="routing" time="0.001" file="out/entry/b.entry.test.ts" line="10" assertions="1">
+        <failure type="AssertionError" message="expect(received).toBe(expected)&#10;&#10;Expected: 200&#10;Received: 404&#10;">AssertionError: expect(received).toBe(expected)</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="smoke" file="out/entry/b.entry.test.ts" line="1" tests="1" assertions="1" failures="0" skipped="0" time="0" hostname="h">
+      <testcase name="[P1.smoke.001] a neutral controller answers 200" classname="smoke" time="0.001" file="out/entry/b.entry.test.ts" line="10" assertions="1" />
+    </testsuite>
+    <testsuite name="lifecycle" file="out/entry/b.entry.test.ts" line="1" tests="1" assertions="1" failures="0" skipped="0" time="0" hostname="h">
+      <testcase name="[P1.lifecycle.004] start({ unix }) serves over a socket" classname="lifecycle" time="0.001" file="out/entry/b.entry.test.ts" line="10" assertions="1" />
+    </testsuite>
+  </testsuite>
+</testsuites>

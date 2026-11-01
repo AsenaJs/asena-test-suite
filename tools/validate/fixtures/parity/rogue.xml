@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="2" assertions="0" failures="1" skipped="1" time="0.1">
+  <testsuite name="test/00-resolution.test.ts" file="test/00-resolution.test.ts" tests="2" assertions="0" failures="1" skipped="1" time="0.01" hostname="h">
+    <testsuite name="resolution" file="test/00-resolution.test.ts" line="1" tests="2" assertions="0" failures="1" skipped="1" time="0" hostname="h">
+      <testcase name="[P1.resolution.001] one core" classname="resolution" time="0" file="test/00-resolution.test.ts" line="10" assertions="0">
+        <skipped />
+      </testcase>
+      <testcase name="[P1.resolution.010] the descriptor declares no divergence flags or unknown keys" classname="resolution" time="0" file="test/00-resolution.test.ts" line="10" assertions="0">
+        <failure type="Error" message="NOT-CONFORMANT: descriptor declares divergence flags or unknown keys: divergences">Error: NOT-CONFORMANT</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,4 @@
+preload = ["../tools/select-adapter.ts"]
+
+[test]
+preload = ["../tools/select-adapter.ts"]
