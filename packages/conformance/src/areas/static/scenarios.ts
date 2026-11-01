@@ -33,6 +33,8 @@ const ESCAPING_TRAVERSAL = [
 
 const MALFORMED = ['/static/%zz.txt', '/static/100%.txt', '/static/%e0%a4%a.txt'];
 
+const IN_ROOT_ENCODED_SLASH = ['/static/sub%2Ffile.txt', '/static/sub%2ffile.txt'];
+
 function fileText(name: string): Promise<string> {
   return Bun.file(join(STATIC_ROOT, name)).text();
 }
@@ -190,6 +192,39 @@ export function register(): void {
         ]);
       },
       { requires: ['static.encodedPathIsDecodedAndChecked'] },
+    );
+
+    scenario(
+      'P1.static.012',
+      'an encoded slash inside the root is decoded once and the file it names is served',
+      async () => {
+        const fixture = staticFixture();
+        await using app = await bootApp({ components: fixture.components });
+        const subFile = await fileText('sub/file.txt');
+        const seen: [string, number, string][] = [];
+
+        for (const target of IN_ROOT_ENCODED_SLASH) {
+          const response = await rawGet(app.port, target);
+
+          seen.push([target, response.status, response.body]);
+        }
+
+        expect(seen).toEqual(IN_ROOT_ENCODED_SLASH.map((target): [string, number, string] => [target, 200, subFile]));
+
+        const missing = await rawGet(app.port, '/static/sub%2Fmissing.txt');
+
+        expect(missing.status).toBe(404);
+        expect(JSON.parse(missing.body)).toEqual(NOT_FOUND);
+        expect(fixture.probe.rewrites).toEqual([
+          '/static/sub/file.txt',
+          '/static/sub/file.txt',
+          '/static/sub/missing.txt',
+        ]);
+        expect(fixture.probe.found.map((path) => path.endsWith('/sub/file.txt'))).toEqual([true, true]);
+        expect(fixture.probe.notFound.map((path) => path.endsWith('/sub/missing.txt'))).toEqual([true]);
+        expect(fixture.probe.handler).toBe(0);
+      },
+      { requires: ['static.encodedSlashInRootIsServed'] },
     );
 
     scenario('P1.static.020', 'a @Page route serves the HTML page', async () => {

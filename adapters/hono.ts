@@ -48,6 +48,7 @@ export const divergences: Partial<Record<DivergenceFlag, false>> = {
   'streaming.sseWriterStateIsLive': false,
   'static.overrideNotFoundContinuesToHandler': false,
   'static.encodedPathIsDecodedAndChecked': false,
+  'static.encodedSlashInRootIsServed': false,
 };
 
 export default descriptor;
