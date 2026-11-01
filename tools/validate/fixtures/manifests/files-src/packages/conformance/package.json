@@ -1,0 +1,10 @@
+{
+  "name": "@asenajs/adapter-conformance",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./helpers": { "types": "./dist/helpers/index.d.ts", "default": "./dist/helpers/index.js" }
+  },
+  "files": ["dist", "src", "README.md"],
+  "peerDependencies": { "@asenajs/asena": "^0.12.0" }
+}

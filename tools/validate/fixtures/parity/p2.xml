@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="4" assertions="3" failures="0" skipped="1" time="0.1">
+  <testsuite name="test/00-resolution.test.ts" file="test/00-resolution.test.ts" tests="1" assertions="1" failures="0" skipped="0" time="0.01" hostname="h">
+    <testcase name="[P2.resolution.001] every ecosystem package resolves one core" classname="" time="0.001" file="test/00-resolution.test.ts" line="10" assertions="1" />
+  </testsuite>
+  <testsuite name="test/services.test.ts" file="test/services.test.ts" tests="1" assertions="0" failures="0" skipped="1" time="0.01" hostname="h">
+    <testcase name="[P2.services.007] a tracked Redis prefix is removed [svc:redis]" classname="" time="0" file="test/services.test.ts" line="10" assertions="0">
+      <skipped />
+    </testcase>
+  </testsuite>
+  <testsuite name="modules/microservice/contract.test.ts" file="modules/microservice/contract.test.ts" tests="1" assertions="1" failures="0" skipped="0" time="0.01" hostname="h">
+    <testcase name="[P2.microservice.contract.memory.C01] request/response on the memory bed" classname="" time="0.001" file="modules/microservice/contract.test.ts" line="10" assertions="1" />
+  </testsuite>
+  <testsuite name="modules/openapi/spec.test.ts" file="modules/openapi/spec.test.ts" tests="1" assertions="1" failures="0" skipped="0" time="0.01" hostname="h">
+    <testcase name="[P2.openapi.001] the contract is honoured &amp; &lt;served&gt;" classname="" time="0.001" file="modules/openapi/spec.test.ts" line="10" assertions="1" />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,70 @@
+name: Asena adapter conformance
+
+on:
+  workflow_call:
+    inputs:
+      entry-path:
+        description: "The caller's one-file runConformance test, relative to the repo root"
+        type: string
+        required: true
+      with-zod:
+        description: 'Install zod next to the package (needed when the descriptor declares optional.zodValidator: true)'
+        type: boolean
+        default: false
+      conformance-version:
+        description: 'npm version or range of @asenajs/adapter-conformance'
+        type: string
+        default: latest
+      bun-version:
+        description: 'Bun version'
+        type: string
+        default: 1.4.4
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    name: adapter conformance
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ inputs.bun-version }}
+
+      - name: Install
+        run: bun install
+
+      - name: Build
+        run: |
+          if jq -e '.scripts.build' package.json > /dev/null; then
+            bun run build
+          else
+            echo 'no build script'
+          fi
+
+      - name: Add the conformance package
+        env:
+          CONFORMANCE_VERSION: ${{ inputs.conformance-version }}
+          WITH_ZOD: ${{ inputs.with-zod }}
+        run: |
+          bun add -d "@asenajs/adapter-conformance@${CONFORMANCE_VERSION}"
+          if [ "$WITH_ZOD" = 'true' ]; then bun add -d zod; fi
+
+      - name: Run conformance
+        env:
+          ENTRY_PATH: ${{ inputs.entry-path }}
+        run: bun test "$ENTRY_PATH" --reporter=junit --reporter-outfile=conformance-junit.xml
+
+      - name: Upload junit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: adapter-conformance-junit
+          path: |
+            conformance-junit.xml
+            junit.xml
+          if-no-files-found: warn

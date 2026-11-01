@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="3" assertions="3" failures="0" skipped="0" time="0.1">
+  <testsuite name="test/routing.test.ts" file="test/routing.test.ts" tests="1" assertions="1" failures="0" skipped="0" time="0.01" hostname="h">
+    <testsuite name="routing" file="test/routing.test.ts" line="1" tests="1" assertions="1" failures="0" skipped="0" time="0" hostname="h">
+      <testcase name="[P1.routing.040] trailing slash alias [cap:routing.trailingSlashAlias]" classname="routing" time="0.001" file="test/routing.test.ts" line="10" assertions="1" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/smoke.test.ts" file="test/smoke.test.ts" tests="1" assertions="1" failures="0" skipped="0" time="0.01" hostname="h">
+    <testsuite name="smoke" file="test/smoke.test.ts" line="1" tests="1" assertions="1" failures="0" skipped="0" time="0" hostname="h">
+      <testcase name="[P1.smoke.001] a neutral controller answers 200" classname="smoke" time="0.001" file="test/smoke.test.ts" line="10" assertions="1" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="test/lifecycle.test.ts" file="test/lifecycle.test.ts" tests="1" assertions="1" failures="0" skipped="0" time="0.01" hostname="h">
+    <testsuite name="lifecycle" file="test/lifecycle.test.ts" line="1" tests="1" assertions="1" failures="0" skipped="0" time="0" hostname="h">
+      <testcase name="[P1.lifecycle.004] start({ unix }) serves over a socket" classname="lifecycle" time="0.001" file="test/lifecycle.test.ts" line="10" assertions="1" />
+    </testsuite>
+  </testsuite>
+</testsuites>

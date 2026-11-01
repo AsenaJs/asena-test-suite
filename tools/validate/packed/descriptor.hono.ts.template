@@ -1,0 +1,38 @@
+import type { AdapterDescriptor } from '@asenajs/adapter-conformance';
+import { Context, CorsMiddleware, createHonoAdapter, RateLimiterMiddleware } from '{{ENTRY}}';
+
+export const descriptor: AdapterDescriptor = {
+  id: 'hono-adapter',
+  packageName: '@asenajs/hono-adapter',
+  createAdapter: ({ logger }) => {
+    const [adapter] = createHonoAdapter({ logger });
+
+    return adapter;
+  },
+  defineContext: (schemas) => Context.define(schemas as never),
+  cliTemplate: 'hono',
+  builtins: {
+    cors: (options) =>
+      class extends CorsMiddleware {
+        public constructor() {
+          super({ ...options });
+        }
+      },
+    rateLimiter: ({ keyGenerator, ...rest }) =>
+      class extends RateLimiterMiddleware {
+        public constructor() {
+          super({ ...rest, ...(keyGenerator ? { keyGenerator: (context) => keyGenerator(context) } : {}) });
+        }
+      },
+  },
+  capabilities: {
+    'optional.notFoundHook': true,
+    'optional.unixSocket': true,
+    'optional.routePattern': true,
+    'optional.requestIp': true,
+    'optional.responseHeaders': true,
+    'optional.zodValidator': true,
+    'optional.builtinCors': true,
+    'optional.builtinRateLimiter': true,
+  },
+};
