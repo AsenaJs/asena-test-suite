@@ -252,6 +252,35 @@ export function register(): void {
       { requires: ['optional.routePattern', 'optional.notFoundHook', 'static.missKeepsRoutePattern'] },
     );
 
+    scenario(
+      'P1.static.014',
+      'a static miss ends in the config onNotFound and never falls through to a matching wildcard route',
+      async () => {
+        const fixture = staticMissFixture({ fallback: true });
+        await using app = await bootApp({ components: fixture.components });
+
+        const missing = await app.get('/site/assets/missing.txt');
+
+        expect(missing.status).toBe(404);
+        expect(missing.json()).toEqual({ notFound: true });
+        expect(Object.keys(fixture.probe.notFound)).toEqual(['/site/assets/missing.txt']);
+        expect(fixture.probe.fallback).toEqual([]);
+
+        const present = await app.get('/site/assets/hello.txt');
+
+        expect(present.status).toBe(200);
+        expect(present.text()).toBe(await fileText('hello.txt'));
+
+        const outside = await app.get('/site/other');
+
+        expect(outside.status).toBe(200);
+        expect(outside.json()).toEqual({ fallback: true });
+        expect(fixture.probe.fallback).toEqual(['/site/other']);
+        expect(fixture.probe.handler).toBe(0);
+      },
+      { requires: ['optional.notFoundHook', 'static.missDoesNotFallThrough'] },
+    );
+
     scenario('P1.static.020', 'a @Page route serves the HTML page', async () => {
       await using app = await bootApp({ components: pageFixture() });
       const response = await app.get('/ui');

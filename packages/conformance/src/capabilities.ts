@@ -25,6 +25,7 @@ export const capabilities: Readonly<Record<CapabilityFlag, Readonly<CapabilityEn
   'static.encodedPathIsDecodedAndChecked': { kind: 'divergence', convergence: 'WP-62' },
   'static.encodedSlashInRootIsServed': { kind: 'divergence', convergence: 'WP-62' },
   'static.missKeepsRoutePattern': { kind: 'divergence', convergence: 'WP-56' },
+  'static.missDoesNotFallThrough': { kind: 'divergence', convergence: 'WP-63' },
   'optional.notFoundHook': {
     kind: 'optional',
     description: 'AsenaAdapter.onNotFound is optional; without it a config onNotFound hook is never called.',

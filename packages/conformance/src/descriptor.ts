@@ -42,7 +42,8 @@ export type DivergenceFlag =
   | 'static.overrideNotFoundContinuesToHandler'
   | 'static.encodedPathIsDecodedAndChecked'
   | 'static.encodedSlashInRootIsServed'
-  | 'static.missKeepsRoutePattern';
+  | 'static.missKeepsRoutePattern'
+  | 'static.missDoesNotFallThrough';
 
 export type CapabilityFlag = OptionalFlag | DivergenceFlag;
 
