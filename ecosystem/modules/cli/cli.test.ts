@@ -1,15 +1,10 @@
 import { afterAll, expect } from 'bun:test';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, isAbsolute, join, resolve } from 'node:path';
+import { dirname, join } from 'node:path';
 import { getDescriptor, scenario } from '@asenajs/adapter-conformance';
 import { isPortFree, randomPort, waitFor } from '@asenajs/adapter-conformance/helpers';
-
-interface Manifest {
-  dependencies?: Record<string, string>;
-  devDependencies?: Record<string, string>;
-  overrides?: Record<string, string>;
-}
+import { expectedCoreRange, localSpecs, packageVersion, portableOverrides, readManifest } from './specs.ts';
 
 const ECOSYSTEM_DIR = join(import.meta.dir, '..', '..');
 const SUITE_ROOT = join(ECOSYSTEM_DIR, '..');
@@ -27,10 +22,6 @@ let installed: Promise<string> | undefined;
 afterAll(() => {
   if (workDir) rmSync(workDir, { recursive: true, force: true });
 });
-
-function readManifest(path: string): Manifest {
-  return JSON.parse(readFileSync(path, 'utf8')) as Manifest;
-}
 
 async function run(cmd: string[], cwd: string): Promise<string> {
   const child = Bun.spawn(cmd, { cwd, env: { ...process.env }, stdout: 'pipe', stderr: 'pipe' });
@@ -69,27 +60,11 @@ function create(template: string): Promise<string> {
   return created;
 }
 
-function localSpecs(manifestPath: string): Map<string, string> {
-  const manifest = readManifest(manifestPath);
-  const specs = new Map<string, string>();
-
-  for (const [name, spec] of Object.entries({ ...manifest.dependencies, ...manifest.devDependencies })) {
-    if (!spec.startsWith('file:')) continue;
-
-    const target = spec.slice('file:'.length);
-
-    specs.set(name, `file:${isAbsolute(target) ? target : resolve(dirname(manifestPath), target)}`);
-  }
-
-  return specs;
-}
-
 function install(template: string): Promise<string> {
   installed ??= (async () => {
     const dir = await create(template);
     const manifestPath = join(dir, 'package.json');
     const manifest = readManifest(manifestPath);
-    const root = readManifest(join(SUITE_ROOT, 'package.json'));
     const local = new Map([
       ...localSpecs(join(SUITE_ROOT, 'package.json')),
       ...localSpecs(join(ECOSYSTEM_DIR, 'package.json')),
@@ -103,7 +78,7 @@ function install(template: string): Promise<string> {
       }
     }
 
-    manifest.overrides = { ...root.overrides };
+    manifest.overrides = portableOverrides(join(SUITE_ROOT, 'package.json'));
     writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 
     const entry = join(dir, 'src', 'index.ts');
@@ -184,10 +159,11 @@ scenario(
   'the generated project installs on the suite core, boots from source and answers its route',
   async () => {
     const dir = await install(getDescriptor().cliTemplate!);
-    const coreRange = readManifest(join(SUITE_ROOT, 'package.json')).overrides?.['@asenajs/asena'] ?? '';
-    const { version } = JSON.parse(readFileSync(join(dir, 'node_modules/@asenajs/asena/package.json'), 'utf8')) as {
-      version: string;
-    };
+    const coreRange = expectedCoreRange(
+      readManifest(join(SUITE_ROOT, 'package.json')).overrides?.['@asenajs/asena'] ?? '',
+      packageVersion(Bun.resolveSync('@asenajs/asena/package.json', SUITE_ROOT)),
+    );
+    const version = packageVersion(join(dir, 'node_modules/@asenajs/asena/package.json'));
 
     expect(Bun.semver.satisfies(version, coreRange)).toBe(true);
     await serveAndAsk(dir, 'src/index.ts');
