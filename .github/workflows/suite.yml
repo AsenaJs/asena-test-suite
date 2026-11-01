@@ -195,7 +195,6 @@ jobs:
       ASENA_SUITE_REQUIRE_SERVICES: '1'
       ASENA_SUITE_MIXED: ergenecore,hono
       ASENA_SUITE_SLOW: '1'
-      ASENA_SUITE_KAFKA_RESTART_CMD: docker restart ${{ job.services.kafka.id }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -229,6 +228,8 @@ jobs:
           { echo '### pack:local'; echo '```'; cat pack-local.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Part 2
+        env:
+          ASENA_SUITE_KAFKA_RESTART_CMD: docker restart ${{ job.services.kafka.id }}
         run: bun run test:p2 --reporter=junit --out "out/p2-${{ matrix.adapter }}.xml"
 
       - name: Upload junit
