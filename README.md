@@ -4,7 +4,7 @@ One test suite for every Asena HTTP adapter. The same scenarios run against `@as
 third-party adapter, and no scenario knows which adapter it is running on.
 
 - **Part 1** - `packages/conformance`, published as [`@asenajs/adapter-conformance`](packages/conformance/README.md): the adapter
-  contract (routing, errors, context, middleware, validation, streaming, static, WebSocket, lifecycle, test harness, built-ins).
+  contract (routing, errors, exception handlers, context, middleware, validation, streaming, static, WebSocket, lifecycle, test harness, built-ins).
   Adapter authors run it in their own repository; that README is their guide.
 - **Part 2** - `ecosystem/`, private: the official ecosystem packages (logger, drizzle, redis, kafka, openapi, otel, CLI, ...)
   on top of each adapter. It reuses Part 1's runtime and helpers and never re-tests the adapter contract.
