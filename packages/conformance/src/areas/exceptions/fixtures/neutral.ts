@@ -23,6 +23,7 @@ export const IN_VALIDATOR = 'exceptions-in-validator';
 export const CONFLICT_BODY = { error: 'exceptions-conflict' };
 export const MISSING_BODY = { error: 'exceptions-missing-order' };
 export const HANDLER_EXPLODED = 'exceptions-handler-exploded';
+export const THROWN_TEXT = 'exceptions-thrown-text';
 export const JSON_HEADERS = { 'content-type': 'application/json' };
 
 export class OrderRejectedError extends Error {
@@ -111,6 +112,11 @@ export function ordersFixture(seen: Seen, define: (schemas: object) => new (...a
     @Get('/not-found-exception')
     public notFoundException(): Response {
       throw new NotFoundException(MISSING_BODY);
+    }
+
+    @Get('/thrown-text')
+    public thrownText(): Response {
+      throw THROWN_TEXT as unknown;
     }
 
     @Get('/ok')

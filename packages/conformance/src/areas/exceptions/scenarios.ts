@@ -25,6 +25,7 @@ import {
   REJECTED,
   SECRET,
   type Seen,
+  THROWN_TEXT,
 } from './fixtures/neutral.ts';
 
 type Component = new (...args: any[]) => unknown;
@@ -348,6 +349,41 @@ export function register(): void {
             body: { by: 'all', name },
           });
         }
+      },
+    );
+
+    scenario(
+      'P1.exceptions.031',
+      'a thrown non-Error value reaches the catch-all @Catch() unchanged; unanswered, it gets the adapter default 500, logged once',
+      async () => {
+        const seen = newSeen();
+        await using app = await bootOrders(seen, [catchAllHandler(seen, 'answers')]);
+        const caught = await withTimeout(app.get('/exceptions/thrown-text'), 3000, 'non-Error throw with a catch-all');
+
+        expect(caught.status).toBe(520);
+        expect(caught.json()).toEqual({ by: 'all', name: 'string' });
+        expect(seen.calls).toEqual([`all:string:${THROWN_TEXT}`]);
+
+        const { logger, entries } = recordingLogger();
+        await using plain = await bootOrders(newSeen(), [], logger);
+        const errorDefault = await snapshot(plain.get('/exceptions/plain'));
+        const unhandled = await snapshot(
+          withTimeout(plain.get('/exceptions/thrown-text'), 3000, 'non-Error throw without a handler'),
+        );
+
+        expect(unhandled).toEqual(errorDefault);
+        expect(unhandled.status).toBe(500);
+        expect(unhandled.body).not.toContain(THROWN_TEXT);
+        expect(failureLines(entries, 500).filter((entry) => mentions(entry, THROWN_TEXT)).length).toBe(1);
+
+        const declining = newSeen();
+        await using declined = await bootOrders(declining, [catchAllHandler(declining, 'declines')]);
+        const fallback = await snapshot(
+          withTimeout(declined.get('/exceptions/thrown-text'), 3000, 'non-Error throw with a declining catch-all'),
+        );
+
+        expect(fallback).toEqual(errorDefault);
+        expect(declining.calls).toEqual([`all:string:${THROWN_TEXT}`]);
       },
     );
 
