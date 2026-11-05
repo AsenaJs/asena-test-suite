@@ -144,14 +144,14 @@ scenario(
 
 scenario(
   id('015'),
-  'a legacy validator records its target: a failure is answered by the adapter default, a pass by the handler',
+  'a legacy validator failure is answered by its validator step, <Validator>.<target>, with no adapter default after it',
   () =>
-    withApp('main', async (child, adapter) => {
-      expect(await chainOf(child, 'POST', '/notes', { title: '' })).toEqual(
-        answered(400, audit, step('validator', 'json'), step('adapter-default', adapter)),
-      );
+    withApp('main', async (child) => {
+      const validator = step('validator', 'NoteValidator.json');
+
+      expect(await chainOf(child, 'POST', '/notes', { title: '' })).toEqual(answered(400, audit, validator));
       expect(await chainOf(child, 'POST', '/notes', { title: 'groceries' })).toEqual(
-        answered(201, audit, step('validator', 'json'), step('controller', 'NoteController.create')),
+        answered(201, audit, validator, step('controller', 'NoteController.create')),
       );
     }),
   opts,
