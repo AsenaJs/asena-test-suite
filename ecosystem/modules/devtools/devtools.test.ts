@@ -170,6 +170,16 @@ scenario(
 );
 
 scenario(
+  id('017'),
+  'an unmatched route with no @NotFound is recorded as answered by the adapter default, named after the adapter',
+  () =>
+    withApp('main.explicit', async (child, adapter) => {
+      expect(await chainOf(child, 'GET', '/nowhere')).toEqual(answered(404, step('adapter-default', adapter)));
+    }),
+  opts,
+);
+
+scenario(
   id('020'),
   'runSchedule runs the job in the app, answers commandResult and records the run; an unknown job answers ok false',
   () =>
