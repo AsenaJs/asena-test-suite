@@ -2,6 +2,7 @@ import type { AsenaContext, AsenaNextHandler, NotFoundRequest } from '@asenajs/a
 import { Config, Controller, ExceptionHandler, Middleware, Schedule, Service } from '@asenajs/asena/decorators';
 import { Get, Post } from '@asenajs/asena/decorators/http';
 import { Inject, Value } from '@asenajs/asena/decorators/ioc';
+import type { DevtoolsRequestLog } from '@asenajs/asena/devtools';
 import { Catch, type ExceptionContext, NotFound } from '@asenajs/asena/exception';
 import { AsenaMiddlewareService, type AsenaValidationService } from '@asenajs/asena/middleware';
 import type { AsenaSchedule } from '@asenajs/asena/schedule';
@@ -11,6 +12,39 @@ import { type ZodType, z } from 'zod';
 type Ctx = AsenaContext<any, any>;
 
 export const CLEANUP_MARKER = 'devtools-fixture: NoteCleanup ran';
+
+/** What `GET /notes/talk/:tag` writes, in order, and to which stream. */
+export const talkOutput = (tag: string): Omit<DevtoolsRequestLog, 'at'>[] => [
+  { stream: 'stdout', text: `devtools-fixture: talk ${tag} arrived\n` },
+  { stream: 'stderr', text: `devtools-fixture: talk ${tag} met\n` },
+  { stream: 'stdout', text: `devtools-fixture: talk ${tag} answered\n` },
+];
+
+let waitingTalk: (() => void) | undefined;
+
+/** Resolves true once a second talk request reaches this point, so both are in flight together. */
+function meetOtherTalk(): Promise<boolean> {
+  const other = waitingTalk;
+
+  if (other) {
+    waitingTalk = undefined;
+    other();
+
+    return Promise.resolve(true);
+  }
+
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      waitingTalk = undefined;
+      resolve(false);
+    }, 3000);
+
+    waitingTalk = () => {
+      clearTimeout(timer);
+      resolve(true);
+    };
+  });
+}
 
 export class NoteMissingError extends Error {
   public constructor() {
@@ -78,6 +112,22 @@ export class NoteController {
   @Post({ path: '/', validator: NoteValidator })
   public create(context: Ctx) {
     return context.send({ created: true }, 201);
+  }
+
+  @Get('/talk/:tag')
+  public async talk(context: Ctx) {
+    const tag = context.getParam('tag');
+    const [arrived, met, answered] = talkOutput(tag);
+
+    console.log(arrived.text.trimEnd());
+
+    const overlapped = await meetOtherTalk();
+
+    await Bun.sleep(5);
+    console.error(met.text.trimEnd());
+    process.stdout.write(answered.text);
+
+    return context.send({ tag, overlapped });
   }
 }
 

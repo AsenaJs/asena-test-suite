@@ -91,7 +91,7 @@ export class AgentChild implements AsyncDisposable {
 
   private commands = 0;
 
-  private consumed = 0;
+  private readonly claimed = new Set<string>();
 
   private stopping?: Promise<ChildExit>;
 
@@ -162,37 +162,31 @@ export class AgentChild implements AsyncDisposable {
     return this.messages.flatMap((message) => (message.type === 'request' ? [message.payload] : []));
   }
 
-  /** Sends one request and returns its response together with the next record the agent sends for it. */
+  /**
+   * Sends one request and returns its response together with the first record for it that no earlier call took,
+   * so concurrent calls for different paths each get their own record.
+   */
   public async fetch(
     method: string,
     path: string,
     body?: unknown,
-  ): Promise<{ status: number; record: DevtoolsRequestRecord }> {
+  ): Promise<{ status: number; body: string; record: DevtoolsRequestRecord }> {
     const response = await fetch(`http://127.0.0.1:${this.port}${path}`, {
       method,
       ...(body === undefined ? {} : { headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }),
     });
-
-    await response.arrayBuffer();
-
-    let record: DevtoolsRequestRecord | undefined;
-
-    await waitFor(
-      () => {
-        const records = this.requests();
-
-        for (; this.consumed < records.length && !record; this.consumed++) {
-          const candidate = records[this.consumed];
-
-          if (candidate.method === method && candidate.path === path) record = candidate;
-        }
-
-        return record !== undefined;
-      },
+    const text = await response.text();
+    const record = await waitFor(
+      () =>
+        this.requests().find(
+          (candidate) => candidate.method === method && candidate.path === path && !this.claimed.has(candidate.id),
+        ),
       { label: `request record for ${method} ${path}`, timeout: 5000 },
     );
 
-    return { status: response.status, record: record! };
+    this.claimed.add(record.id);
+
+    return { status: response.status, body: text, record };
   }
 
   public async command(command: DevtoolsCommand): Promise<DevtoolsCommandResult> {

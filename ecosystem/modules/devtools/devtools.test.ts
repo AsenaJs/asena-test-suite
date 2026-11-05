@@ -2,7 +2,7 @@ import { expect } from 'bun:test';
 import type { DevtoolsRequestStep, DevtoolsStepKind } from '@asenajs/asena/devtools';
 import { scenario } from '@asenajs/adapter-conformance';
 import { waitFor } from '@asenajs/adapter-conformance/helpers';
-import { CLEANUP_MARKER } from './fixtures/app.ts';
+import { CLEANUP_MARKER, talkOutput } from './fixtures/app.ts';
 import { appSnapshot, explicitSnapshot } from './fixtures/snapshot.ts';
 import { AgentChild, type FixtureEntry, installedCoreVersion } from './harness/agentChild.ts';
 
@@ -221,5 +221,32 @@ scenario(
     expect({ code: exit.code, signal: exit.signal }).toEqual({ code: 0, signal: null });
     expect(exit.afterMs).toBeLessThan(3000);
   },
+  opts,
+);
+
+scenario(
+  id('040'),
+  'two overlapping requests that both write get only their own output in logs, in order, on the stream it went to',
+  () =>
+    withApp('main', async (child) => {
+      const talks = await Promise.all(['a', 'b'].map((tag) => child.fetch('GET', `/notes/talk/${tag}`)));
+
+      for (const [index, tag] of ['a', 'b'].entries()) {
+        const { status, body, record } = talks[index];
+
+        expect({ status, body: JSON.parse(body) }).toEqual({ status: 200, body: { tag, overlapped: true } });
+        expect(record.answeredBy).toEqual(step('controller', 'NoteController.talk'));
+        expect(record.logs).toEqual(talkOutput(tag).map((line) => ({ ...line, at: expect.any(Number) })));
+        expect(record.logsTruncated).toBeUndefined();
+
+        for (const line of talkOutput(tag)) {
+          await waitFor(() => child.output().includes(line.text.trimEnd()), {
+            label: `${line.text} on the real stream`,
+          });
+        }
+      }
+
+      expect((await child.fetch('GET', '/status')).record.logs).toBeUndefined();
+    }),
   opts,
 );

@@ -56,6 +56,7 @@ export const appSnapshot: DevtoolsSnapshot = {
     route('NoteController', 'broken', 'GET', '/notes/broken'),
     route('NoteController', 'locked', 'GET', '/notes/locked', { middlewares: ['NoteLock'] }),
     route('NoteController', 'missing', 'GET', '/notes/missing'),
+    route('NoteController', 'talk', 'GET', '/notes/talk/:tag'),
     route('StatusController', 'read', 'GET', '/status/'),
   ],
   pages: [],
