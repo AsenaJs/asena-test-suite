@@ -38,8 +38,9 @@ async function withApp(entry: FixtureEntry, body: (child: AgentChild, adapter: s
   await using child = await AgentChild.spawn(entry);
   const { adapter } = await child.hello();
 
-  expect(typeof adapter).toBe('string');
-  await body(child, adapter!);
+  if (typeof adapter !== 'string') throw new Error(`the agent named no adapter: ${String(adapter)}`);
+
+  await body(child, adapter);
 }
 
 scenario(
