@@ -20,7 +20,7 @@ const ECOSYSTEM_DIR = join(import.meta.dir, '..', '..', '..');
 const FIXTURES_DIR = join(import.meta.dir, '..', 'fixtures');
 const ATTEMPTS = 3;
 
-export type FixtureEntry = 'main' | 'main.explicit';
+export type FixtureEntry = 'main' | 'main.explicit' | 'main.drafts';
 
 export interface ChildExit {
   code: number | null;

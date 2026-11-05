@@ -2,7 +2,7 @@ import { expect } from 'bun:test';
 import type { DevtoolsRequestStep, DevtoolsStepKind } from '@asenajs/asena/devtools';
 import { scenario } from '@asenajs/adapter-conformance';
 import { waitFor } from '@asenajs/adapter-conformance/helpers';
-import { CLEANUP_MARKER, talkOutput } from './fixtures/app.ts';
+import { CLEANUP_MARKER, FLOOD_CHUNK, FLOOD_LINES, LATE_MARKER, floodLine, talkOutput } from './fixtures/app.ts';
 import { appSnapshot, explicitSnapshot } from './fixtures/snapshot.ts';
 import { AgentChild, type FixtureEntry, installedCoreVersion } from './harness/agentChild.ts';
 
@@ -180,8 +180,52 @@ scenario(
 );
 
 scenario(
+  id('018'),
+  'a validator hook answering the failure is the answer: the validator step, with no adapter default after it',
+  () =>
+    withApp('main.drafts', async (child) => {
+      const validator = step('validator', 'DraftHookValidator.json');
+      const failed = await child.fetch('POST', '/drafts/hooked', { title: '' });
+
+      expect(JSON.parse(failed.body)).toEqual({ by: 'hook' });
+      expect(await chainOf(child, 'POST', '/drafts/hooked', { title: '' })).toEqual(answered(422, validator));
+      expect(await chainOf(child, 'POST', '/drafts/hooked', { title: 'draft' })).toEqual(
+        answered(201, validator, step('controller', 'DraftController.hooked')),
+      );
+    }),
+  opts,
+);
+
+scenario(
+  id('019'),
+  'a validation failure an app @Catch or onError answers is recorded as that handler, after the validator step',
+  () =>
+    withApp('main.drafts', async (child) => {
+      const caught = await child.fetch('POST', '/drafts/caught', { title: '' });
+
+      expect(JSON.parse(caught.body)).toEqual({ by: 'catch', target: 'json' });
+      expect(await chainOf(child, 'POST', '/drafts/caught', { title: '' })).toEqual(
+        answered(422, step('validator', 'DraftValidator.json'), step('catch', 'DraftErrors.validation')),
+      );
+
+      const handled = await child.fetch('GET', '/drafts/search');
+
+      expect(JSON.parse(handled.body)).toEqual({ by: 'onError', target: 'query' });
+      expect(await chainOf(child, 'GET', '/drafts/search')).toEqual(
+        answered(
+          422,
+          step('validator', 'DraftQueryValidator.query'),
+          step('catch', 'DraftErrors.validation'),
+          step('config-onError', 'DraftConfig.onError'),
+        ),
+      );
+    }),
+  opts,
+);
+
+scenario(
   id('020'),
-  'runSchedule runs the job in the app, answers commandResult and records the run; an unknown job answers ok false',
+  'runSchedule runs the job in the app, answers commandResult and records the run with its output; an unknown job answers ok false',
   () =>
     withApp('main', async (child) => {
       expect(await child.command({ command: 'runSchedule', name: 'NoteCleanup' })).toEqual({
@@ -196,6 +240,7 @@ scenario(
           status: 200,
           steps: [step('controller', 'NoteCleanup.execute')],
           answeredBy: step('controller', 'NoteCleanup.execute'),
+          logs: [{ stream: 'stdout', text: `${CLEANUP_MARKER}\n`, at: expect.any(Number) }],
         }),
       ]);
 
@@ -247,6 +292,56 @@ scenario(
       }
 
       expect((await child.fetch('GET', '/status')).record.logs).toBeUndefined();
+    }),
+  opts,
+);
+
+scenario(
+  id('041'),
+  'a record keeps the first 100 writes or 16 KiB of output, whichever comes first, and says logsTruncated',
+  () =>
+    withApp('main', async (child) => {
+      const entries = (await child.fetch('GET', '/notes/flood/entries')).record;
+
+      expect(entries.logs?.map((log) => log.text)).toEqual(
+        Array.from({ length: 100 }, (_, index) => `${floodLine(index)}\n`),
+      );
+      expect(entries.logsTruncated).toBe(true);
+      await waitFor(() => child.output().includes(floodLine(FLOOD_LINES - 1)), {
+        label: 'every line on the real stream',
+      });
+
+      const chars = (await child.fetch('GET', '/notes/flood/chars')).record;
+      const kept = chars.logs?.map((log) => log.text).join('') ?? '';
+
+      expect({ kept: kept.length, onlyChunks: /^x+$/.test(kept), truncated: chars.logsTruncated }).toEqual({
+        kept: 16 * 1024,
+        onlyChunks: true,
+        truncated: true,
+      });
+      expect(chars.logs?.every((log) => log.stream === 'stdout')).toBe(true);
+      await waitFor(() => child.output().includes('x'.repeat(FLOOD_CHUNK.size * FLOOD_CHUNK.count)), {
+        label: 'every chunk on the real stream',
+      });
+    }),
+  opts,
+);
+
+scenario(
+  id('042'),
+  'output written after the record closed reaches the real stream but no record',
+  () =>
+    withApp('main', async (child) => {
+      const { record } = await child.fetch('GET', '/notes/late');
+
+      expect(record.logs).toEqual([{ stream: 'stdout', text: `${LATE_MARKER.before}\n`, at: expect.any(Number) }]);
+      await waitFor(() => child.output().includes(LATE_MARKER.after), { label: 'the late line on the real stream' });
+
+      // IPC keeps order: once this record arrived, anything sent for the late line already has.
+      expect((await child.fetch('GET', '/status')).record.logs).toBeUndefined();
+      expect(child.requests().filter((entry) => JSON.stringify(entry.logs ?? []).includes(LATE_MARKER.after))).toEqual(
+        [],
+      );
     }),
   opts,
 );

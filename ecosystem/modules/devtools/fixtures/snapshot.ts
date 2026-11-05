@@ -54,6 +54,8 @@ export const appSnapshot: DevtoolsSnapshot = {
     route('NoteController', 'list', 'GET', '/notes/'),
     route('NoteController', 'create', 'POST', '/notes/', { validator: 'NoteValidator', hasBodySchema: true }),
     route('NoteController', 'broken', 'GET', '/notes/broken'),
+    route('NoteController', 'flood', 'GET', '/notes/flood/:unit'),
+    route('NoteController', 'late', 'GET', '/notes/late'),
     route('NoteController', 'locked', 'GET', '/notes/locked', { middlewares: ['NoteLock'] }),
     route('NoteController', 'missing', 'GET', '/notes/missing'),
     route('NoteController', 'talk', 'GET', '/notes/talk/:tag'),

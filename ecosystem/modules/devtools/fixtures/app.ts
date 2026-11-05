@@ -20,6 +20,19 @@ export const talkOutput = (tag: string): Omit<DevtoolsRequestLog, 'at'>[] => [
   { stream: 'stdout', text: `devtools-fixture: talk ${tag} answered\n` },
 ];
 
+/** `GET /notes/flood/entries` logs this many lines, past the 100 entry cap. */
+export const FLOOD_LINES = 120;
+
+export const floodLine = (index: number) => `devtools-fixture: flood ${index}`;
+
+/** `GET /notes/flood/chars` writes this many characters this many times, past the 16 KiB cap. */
+export const FLOOD_CHUNK = { size: 10_000, count: 3 };
+
+export const LATE_MARKER = {
+  before: 'devtools-fixture: late before the answer',
+  after: 'devtools-fixture: late after the answer',
+};
+
 let waitingTalk: (() => void) | undefined;
 
 /** Resolves true once a second talk request reaches this point, so both are in flight together. */
@@ -128,6 +141,26 @@ export class NoteController {
     process.stdout.write(answered.text);
 
     return context.send({ tag, overlapped });
+  }
+
+  @Get('/flood/:unit')
+  public flood(context: Ctx) {
+    if (context.getParam('unit') === 'entries') {
+      for (let index = 0; index < FLOOD_LINES; index++) console.log(floodLine(index));
+    } else {
+      for (let index = 0; index < FLOOD_CHUNK.count; index++) process.stdout.write('x'.repeat(FLOOD_CHUNK.size));
+      process.stdout.write('\n');
+    }
+
+    return context.send({ flooded: true });
+  }
+
+  @Get('/late')
+  public late(context: Ctx) {
+    console.log(LATE_MARKER.before);
+    setTimeout(() => console.log(LATE_MARKER.after), 50);
+
+    return context.send({ late: true });
   }
 }
 
