@@ -1,0 +1,139 @@
+import type { AsenaContext, AsenaNextHandler, NotFoundRequest } from '@asenajs/asena/adapter';
+import { Config, Controller, ExceptionHandler, Middleware, Schedule, Service } from '@asenajs/asena/decorators';
+import { Get, Post } from '@asenajs/asena/decorators/http';
+import { Inject, Value } from '@asenajs/asena/decorators/ioc';
+import { Catch, type ExceptionContext, NotFound } from '@asenajs/asena/exception';
+import { AsenaMiddlewareService, type AsenaValidationService } from '@asenajs/asena/middleware';
+import type { AsenaSchedule } from '@asenajs/asena/schedule';
+import type { AsenaConfig } from '@asenajs/asena/server/config';
+import { type ZodType, z } from 'zod';
+
+type Ctx = AsenaContext<any, any>;
+
+export const CLEANUP_MARKER = 'devtools-fixture: NoteCleanup ran';
+
+export class NoteMissingError extends Error {
+  public constructor() {
+    super('note missing');
+    this.name = 'NoteMissingError';
+  }
+}
+
+@Service()
+export class NoteStore {
+  @Value('DEVTOOLS_FIXTURE_PAGE_SIZE', { parse: Number, default: 20 })
+  public pageSize!: number;
+
+  public list(): string[] {
+    return ['first', 'second'].slice(0, this.pageSize);
+  }
+}
+
+@Middleware()
+export class NoteAudit extends AsenaMiddlewareService {
+  public async handle(_context: Ctx, next: AsenaNextHandler) {
+    await next();
+  }
+}
+
+@Middleware()
+export class NoteLock extends AsenaMiddlewareService {
+  public async handle(): Promise<boolean> {
+    return false;
+  }
+}
+
+@Middleware({ validator: true })
+export class NoteValidator implements AsenaValidationService<ZodType> {
+  public json() {
+    return z.object({ title: z.string().min(1) });
+  }
+}
+
+@Controller('/notes')
+export class NoteController {
+  @Inject(NoteStore)
+  private store!: NoteStore;
+
+  @Get('/')
+  public list(context: Ctx) {
+    return context.send({ notes: this.store.list() });
+  }
+
+  @Get('/missing')
+  public missing(): Response {
+    throw new NoteMissingError();
+  }
+
+  @Get('/broken')
+  public broken(): Response {
+    throw new Error('devtools-fixture: broken');
+  }
+
+  @Get({ path: '/locked', middlewares: [NoteLock] })
+  public locked(context: Ctx) {
+    return context.send({ unreachable: true });
+  }
+
+  @Post({ path: '/', validator: NoteValidator })
+  public create(context: Ctx) {
+    return context.send({ created: true }, 201);
+  }
+}
+
+@Controller('/status')
+export class StatusController {
+  @Get('/')
+  public read(context: Ctx) {
+    return context.send({ ok: true });
+  }
+}
+
+@ExceptionHandler()
+export class NoteErrors {
+  @Catch(NoteMissingError)
+  public missing(_error: NoteMissingError, ctx: ExceptionContext<Ctx>) {
+    if (ctx.scope !== 'http') return undefined;
+
+    return ctx.context.send({ error: 'note missing' }, 404);
+  }
+}
+
+@ExceptionHandler()
+export class NoteFallback {
+  @NotFound()
+  public notFound(context: Ctx, request: NotFoundRequest) {
+    return context.send({ error: 'no such page', path: request.path }, 404);
+  }
+}
+
+@Schedule({ cron: '0 3 * * *' })
+export class NoteCleanup implements AsenaSchedule {
+  public async execute() {
+    console.log(CLEANUP_MARKER);
+  }
+}
+
+@Config()
+export class NoteConfig implements AsenaConfig {
+  public globalMiddlewares() {
+    return [{ middleware: NoteAudit, routes: { include: ['/notes/*'] } }];
+  }
+}
+
+/** Every component of the app, in the order `asena console` would list them. */
+export const allComponents = [
+  NoteStore,
+  NoteAudit,
+  NoteLock,
+  NoteValidator,
+  NoteController,
+  StatusController,
+  NoteErrors,
+  NoteFallback,
+  NoteCleanup,
+  NoteConfig,
+];
+
+/** What the explicit entry hands `AsenaServerFactory.create`: everything but the `@NotFound` handler. */
+export const explicitComponents = allComponents.filter((component) => component !== NoteFallback);
