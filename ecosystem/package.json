@@ -4,6 +4,7 @@
   "type": "module",
   "dependencies": {
     "@asenajs/adapter-conformance": "workspace:*",
+    "@asenajs/asena-auth": "^1.0.0",
     "@asenajs/asena-cli": "^0.11.1",
     "@asenajs/asena-drizzle": "^4.0.1",
     "@asenajs/asena-kafka": "^4.0.1",
