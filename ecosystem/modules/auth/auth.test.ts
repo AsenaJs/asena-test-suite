@@ -1,6 +1,6 @@
 import { expect, setSystemTime } from 'bun:test';
 import type { TestApp } from '@asenajs/asena/test';
-import { bootApp, getDescriptor, scenario } from '@asenajs/adapter-conformance';
+import { bootApp, getDescriptor, scenario, type ScenarioOptions } from '@asenajs/adapter-conformance';
 import type { AsenaAuthService } from '@asenajs/asena-auth';
 import {
   FORWARDED_COOKIE_EXPIRES,
@@ -14,12 +14,14 @@ import {
   type MarkLevel,
   onStartOrderFixture,
   proxiedAppFixture,
+  type RoutePatternFixture,
   routePatternFixture,
   SESSION_COOKIE,
   sessionFixture,
   slideFixture,
   socketValueFixture,
   tokenFor,
+  unslashedPatternFixture,
 } from './fixtures/auth.ts';
 import { PUBLIC_HOST, PUBLIC_ORIGIN, startTlsTerminatingProxy } from './fixtures/proxy.ts';
 import { connect } from './fixtures/socket.ts';
@@ -350,27 +352,44 @@ scenario(
 
 const patterns = () => routePatternFixture((schemas) => getDescriptor().defineContext(schemas));
 
-type PatternCase = [id: string, label: string, method: string, url: string, pattern: string];
-
-const patternCases: PatternCase[] = [
-  ['P2.auth.023', 'root route', 'GET', '/api/users', '/api/users'],
-  ['P2.auth.024', 'param route', 'GET', '/api/users/7', '/api/users/:id'],
-  ['P2.auth.025', 'POST with route middlewares', 'POST', '/api/users', '/api/users'],
-  ['P2.auth.026', 'trailing-slash route', 'GET', '/api/users/x', '/api/users/x'],
-  ['P2.auth.027', 'inherited root route', 'GET', '/api/admins', '/api/admins'],
-  ['P2.auth.028', 'inherited param route', 'GET', '/api/admins/7', '/api/admins/:id'],
-  ['P2.auth.029', 'no trailing slash (separate controller)', 'GET', '/api/slash/x', '/api/slash/x'],
-  ['P2.auth.030', 'HEAD on a GET route', 'HEAD', '/api/users/7', '/api/users/:id'],
-  ['P2.auth.031', '@All route, GET', 'GET', '/api/users/any', '/api/users/any'],
-  ['P2.auth.032', '@All route, DELETE', 'DELETE', '/api/users/any', '/api/users/any'],
+type PatternCase = [
+  id: string,
+  label: string,
+  method: string,
+  url: string,
+  pattern: string,
+  fixture: () => RoutePatternFixture,
+  requires?: ScenarioOptions['requires'],
 ];
 
-for (const [id, label, method, url, pattern] of patternCases) {
+const patternCases: PatternCase[] = [
+  ['P2.auth.023', 'root route', 'GET', '/api/users', '/api/users', patterns],
+  ['P2.auth.024', 'param route', 'GET', '/api/users/7', '/api/users/:id', patterns],
+  ['P2.auth.025', 'POST with route middlewares', 'POST', '/api/users', '/api/users', patterns],
+  ['P2.auth.026', 'trailing-slash route', 'GET', '/api/users/x', '/api/users/x', patterns],
+  ['P2.auth.027', 'inherited root route', 'GET', '/api/admins', '/api/admins', patterns],
+  ['P2.auth.028', 'inherited param route', 'GET', '/api/admins/7', '/api/admins/:id', patterns],
+  ['P2.auth.029', 'no trailing slash (separate controller)', 'GET', '/api/slash/x', '/api/slash/x', patterns],
+  ['P2.auth.030', 'HEAD on a GET route', 'HEAD', '/api/users/7', '/api/users/:id', patterns],
+  ['P2.auth.031', '@All route, GET', 'GET', '/api/users/any', '/api/users/any', patterns],
+  ['P2.auth.032', '@All route, DELETE', 'DELETE', '/api/users/any', '/api/users/any', patterns],
+  [
+    'P2.auth.034',
+    'a controller prefix and route path without a leading slash',
+    'GET',
+    '/plain/y',
+    '/plain/y',
+    unslashedPatternFixture,
+    ['optional.routePattern', 'routing.unslashedPathIsServed'],
+  ],
+];
+
+for (const [id, label, method, url, pattern, fixture, requires = routePattern.requires] of patternCases) {
   scenario(
     id,
     `routePattern meets the guard's route key: ${label}`,
     async () => {
-      const { components, seen } = patterns();
+      const { components, seen } = fixture();
 
       await using app = await bootApp({ components });
       const token = await tokenFor(app, 'PatternAuth');
@@ -382,7 +401,7 @@ for (const [id, label, method, url, pattern] of patternCases) {
       expect(seen).toHaveLength(1);
       expect([`${method} ${pattern}`, `${method} ${pattern}/`]).toContain(seen[0]);
     },
-    routePattern,
+    { requires },
   );
 }
 

@@ -377,6 +377,23 @@ export function routePatternFixture(define: DefineContext): RoutePatternFixture 
   };
 }
 
+/** A guarded controller whose prefix and route path both lack the leading slash. */
+export function unslashedPatternFixture(): RoutePatternFixture {
+  const seen: string[] = [];
+  const { PatternAuth, PatternProbe } = patternProbe(seen);
+
+  @Protected()
+  @Controller('plain')
+  class PatternNoLeadingSlash {
+    @Get({ path: 'y', middlewares: [PatternProbe] })
+    public y(context: Ctx) {
+      return context.send('y');
+    }
+  }
+
+  return { components: [...GUARD, PatternAuth, PatternProbe, PatternNoLeadingSlash], seen };
+}
+
 /** A route middleware that injects a service by name, listed before it; both record their `@OnStart`. */
 export function onStartOrderFixture(): AuthFixture {
   const calls: string[] = [];

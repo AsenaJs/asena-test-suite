@@ -12,6 +12,11 @@ export interface CapabilityEntry {
 }
 
 export const capabilities: Readonly<Record<CapabilityFlag, Readonly<CapabilityEntry>>> = Object.freeze({
+  'routing.unslashedPathIsServed': {
+    kind: 'divergence',
+    convergence: 'WP-66',
+    expectedFailure: /Invalid route "[^"/][^"]*"\. Path must start with '\/'/,
+  },
   'optional.notFoundHook': {
     kind: 'optional',
     description: 'AsenaAdapter.onNotFound is optional; without it a config onNotFound hook is never called.',
