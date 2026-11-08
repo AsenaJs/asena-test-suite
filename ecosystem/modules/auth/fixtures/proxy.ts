@@ -98,9 +98,16 @@ export function startTlsTerminatingProxy(upstream: string): TlsTerminatingProxy 
         },
       });
     } catch (error) {
+      if (!addressInUse(error)) throw error;
       lastError = error;
     }
   }
 
   throw lastError;
+}
+
+function addressInUse(error: unknown): boolean {
+  const { code, message } = error as { code?: unknown; message?: unknown };
+
+  return code === 'EADDRINUSE' || (typeof message === 'string' && /EADDRINUSE|address already in use/i.test(message));
 }
