@@ -33,7 +33,7 @@
     "prepack": "bun run build"
   },
   "peerDependencies": {
-    "@asenajs/asena": "^0.12.0",
+    "@asenajs/asena": "^0.13.0",
     "zod": "^4.3.6"
   },
   "peerDependenciesMeta": {

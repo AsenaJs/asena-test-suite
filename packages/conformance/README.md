@@ -14,7 +14,7 @@ network and no configuration besides one descriptor file.
 bun add -d @asenajs/adapter-conformance
 ```
 
-Peers: `@asenajs/asena` (`^0.12.0`, which your adapter already peers) and, optionally, `zod`. Add `zod` only if your adapter
+Peers: `@asenajs/asena` (`^0.13.0`, which your adapter already peers) and, optionally, `zod`. Add `zod` only if your adapter
 supports zod schemas as its legacy validator dialect (`optional.zodValidator: true` below); nothing else in the suite needs it.
 
 Requires Bun `>= 1.4.0`.
@@ -190,7 +190,7 @@ These run first and explain most broken setups:
 |---|---|---|
 | `P1.resolution.001` | one `@asenajs/asena` copy: the package's and your adapter's resolve to the same file | a second core (for example a nested `node_modules/@asenajs/asena` under a linked package); dedupe so that only your repo's peer copy remains, and check `packageRoot` |
 | `P1.resolution.002` | a `@PostConstruct` hook runs in an app booted with your adapter | the DI container silently does nothing, almost always because of two core copies (see 001) |
-| `P1.resolution.003` | the installed core satisfies this package's peer range (`^0.12.0`) | upgrade `@asenajs/asena` in your repo |
+| `P1.resolution.003` | the installed core satisfies this package's peer range (`^0.13.0`) | upgrade `@asenajs/asena` in your repo |
 | `P1.resolution.004` | the package's own fixtures carry legacy decorator metadata | `NOT-CONFIGURED: ...` means this package was built without `experimentalDecorators`/`emitDecoratorMetadata`; that is a broken release of this package, not your setup - please report it |
 | `P1.resolution.010` | the descriptor carries no divergence flags or unknown keys | `NOT-CONFORMANT: ...`, see above |
 

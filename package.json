@@ -22,9 +22,9 @@
     "build": "bun --cwd=packages/conformance run build"
   },
   "devDependencies": {
-    "@asenajs/asena": "^0.12.4",
-    "@asenajs/ergenecore": "^5.0.3",
-    "@asenajs/hono-adapter": "^5.1.0",
+    "@asenajs/asena": "^0.13.0",
+    "@asenajs/ergenecore": "^5.1.0",
+    "@asenajs/hono-adapter": "^5.2.0",
     "@eslint/js": "^9.39.5",
     "@types/bun": "^1.4.4",
     "@types/node": "^24.19.2",
@@ -37,6 +37,6 @@
     "zod": "^4.3.6"
   },
   "overrides": {
-    "@asenajs/asena": "^0.12.4"
+    "@asenajs/asena": "^0.13.0"
   }
 }
