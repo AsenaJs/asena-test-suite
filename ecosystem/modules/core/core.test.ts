@@ -10,6 +10,7 @@ import { bootApp, scenario } from '@asenajs/adapter-conformance';
 import { waitFor } from '@asenajs/adapter-conformance/helpers';
 import { type EventEntry, eventFixture } from './fixtures/events.ts';
 import { bootShutdownApp, connectionRefused, readyStatus } from './fixtures/shutdown.ts';
+import { runStopFixture } from './fixtures/stopChild.ts';
 
 type Ctx = AsenaContext<any, any>;
 type Component = new (...args: any[]) => unknown;
@@ -158,6 +159,19 @@ scenario(
     expect(probe.newConnectionRefused).toBe(true);
     expect(probe.order).toEqual(['onStop', 'transport.destroy']);
   },
+);
+
+scenario(
+  'P2.core.022',
+  'a shutdown signal exits 1 when an @OnStop hook throws and 0 when it returns; an explicit stop() leaves the exit code alone',
+  async () => {
+    const clean = { code: 0, signal: null, hookRan: true };
+
+    expect(await runStopFixture('throws', 'signal')).toEqual({ ...clean, code: 1 });
+    expect(await runStopFixture('returns', 'signal')).toEqual(clean);
+    expect(await runStopFixture('throws', 'call')).toEqual(clean);
+  },
+  { timeout: 30_000 },
 );
 
 scenario('P2.core.030', 'an inherited route and an own route on the same path refuse to boot', async () => {
