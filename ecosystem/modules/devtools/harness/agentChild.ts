@@ -175,7 +175,9 @@ export class AgentChild implements AsyncDisposable {
   }
 
   public async snapshot(): Promise<ServerSnapshot> {
-    return (await this.first('snapshot')).payload as ServerSnapshot;
+    await this.first('snapshot');
+
+    return this.snapshots()[0];
   }
 
   /** The first `count` hellos, one per server, in the order the servers attached. */
