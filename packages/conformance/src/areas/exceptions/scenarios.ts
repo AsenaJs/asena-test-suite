@@ -26,6 +26,7 @@ import {
   SECRET,
   type Seen,
   THROWN_TEXT,
+  THROWN_VALUES,
 } from './fixtures/neutral.ts';
 
 type Component = new (...args: any[]) => unknown;
@@ -226,6 +227,54 @@ export function register(): void {
     );
 
     scenario(
+      'P1.exceptions.015',
+      'with no @Catch(HttpException), @Catch(Error) receives HttpException, NotFoundException and a contract validation failure',
+      async () => {
+        const seen = newSeen();
+        await using app = await bootOrders(seen, [errorHandler(seen, 'answers')]);
+        const requests: [string, () => PromiseLike<{ status: number; json<T = unknown>(): T }>][] = [
+          ['HttpException', () => app.get('/exceptions/http')],
+          ['NotFoundException', () => app.get('/exceptions/not-found-exception')],
+          ['ContractValidationError', () => postInvalid(app)],
+        ];
+
+        for (const [name, send] of requests) {
+          const response = await send();
+
+          expect({ name, status: response.status, body: response.json() }).toEqual({
+            name,
+            status: 520,
+            body: { by: 'error', name },
+          });
+        }
+
+        expect(seen.calls).toEqual(['error:HttpException', 'error:NotFoundException', 'error:ContractValidationError']);
+        expect(seen.handlerCalls).toEqual([]);
+      },
+    );
+
+    scenario(
+      'P1.exceptions.016',
+      'a @Catch(Error) that declines an HttpException or a contract validation failure gets the answer an app without it gives',
+      async () => {
+        const paths = ['/exceptions/http', '/exceptions/not-found-exception'];
+        const defaults = await adapterDefaults(paths);
+        const seen = newSeen();
+        await using app = await bootOrders(seen, [errorHandler(seen, 'declines')]);
+
+        for (const path of paths) {
+          expect({ path, ...(await snapshot(app.get(path))) }).toEqual({ path, ...defaults.get(path)! });
+        }
+
+        expect(await snapshot(postInvalid(app))).toEqual(defaults.get('POST /exceptions/validated')!);
+        expect(defaults.get('/exceptions/http')!.status).toBe(409);
+        expect(defaults.get('/exceptions/not-found-exception')!.status).toBe(404);
+        expect(defaults.get('POST /exceptions/validated')!.status).toBe(400);
+        expect(seen.calls).toEqual(['error:HttpException', 'error:NotFoundException', 'error:ContractValidationError']);
+      },
+    );
+
+    scenario(
       'P1.exceptions.020',
       'a @Catch that declines a plain Error gets the adapter default 500, logged once',
       async () => {
@@ -328,6 +377,21 @@ export function register(): void {
     );
 
     scenario(
+      'P1.exceptions.026',
+      'when a @Catch answers, the original error is logged once, at debug level',
+      async () => {
+        const seen = newSeen();
+        const { logger, entries } = recordingLogger();
+        await using app = await bootOrders(seen, [errorHandler(seen, 'answers')], logger);
+        const response = await app.get('/exceptions/plain');
+
+        expect(response.status).toBe(520);
+        expect(response.text()).not.toContain(SECRET);
+        expect(entries.filter((entry) => mentions(entry, SECRET)).map((entry) => entry.level)).toEqual(['debug']);
+      },
+    );
+
+    scenario(
       'P1.exceptions.030',
       'the catch-all @Catch() receives HttpException, contract validation failures and plain errors',
       async () => {
@@ -399,6 +463,62 @@ export function register(): void {
 
         expect(response).toEqual(expected);
         expect(response.status).toBe(404);
+        expect(seen.calls).toEqual([]);
+      },
+    );
+
+    for (const [kind, value] of Object.entries(THROWN_VALUES)) {
+      scenario(
+        `P1.exceptions.033.${kind}`,
+        `a thrown ${kind} reaches the catch-all @Catch() unchanged; unanswered, it gets the adapter default 500, logged once`,
+        async () => {
+          const path = `/exceptions/thrown/${kind}`;
+          const seen = newSeen();
+          await using app = await bootOrders(seen, [catchAllHandler(seen, 'answers')]);
+          const caught = await withTimeout(app.get(path), 3000, `thrown ${kind} with a catch-all`);
+
+          expect(caught.status).toBe(520);
+          expect(caught.json()).toEqual({ by: 'all', name: typeof value });
+          expect(seen.thrown.length).toBe(1);
+          expect(seen.thrown[0]).toBe(value);
+
+          const { logger, entries } = recordingLogger();
+          await using plain = await bootOrders(newSeen(), [], logger);
+          const errorDefault = await snapshot(plain.get('/exceptions/plain'));
+          const logged = failureLines(entries, 500).length;
+          const unhandled = await snapshot(withTimeout(plain.get(path), 3000, `thrown ${kind} without a handler`));
+
+          expect(unhandled).toEqual(errorDefault);
+          expect(unhandled.status).toBe(500);
+          expect(failureLines(entries, 500).length - logged).toBe(1);
+
+          const declining = newSeen();
+          await using declined = await bootOrders(declining, [catchAllHandler(declining, 'declines')]);
+          const fallback = await snapshot(
+            withTimeout(declined.get(path), 3000, `thrown ${kind} with a declining catch-all`),
+          );
+
+          expect(fallback).toEqual(errorDefault);
+          expect(declining.thrown.length).toBe(1);
+          expect(declining.thrown[0]).toBe(value);
+          expect((await declined.get('/exceptions/ok')).status).toBe(200);
+        },
+      );
+    }
+
+    scenario(
+      'P1.exceptions.034',
+      'a thrown non-Error value never reaches @Catch(Error) and gets the adapter default 500',
+      async () => {
+        const defaults = await adapterDefaults(['/exceptions/plain']);
+        const seen = newSeen();
+        await using app = await bootOrders(seen, [errorHandler(seen, 'answers')]);
+        const response = await snapshot(
+          withTimeout(app.get('/exceptions/thrown-text'), 3000, 'non-Error throw with only @Catch(Error)'),
+        );
+
+        expect(response).toEqual(defaults.get('/exceptions/plain')!);
+        expect(response.status).toBe(500);
         expect(seen.calls).toEqual([]);
       },
     );
@@ -514,6 +634,84 @@ export function register(): void {
       },
       { requires: ['optional.notFoundHook'] },
     );
+
+    for (const mode of ['declines', 'declines-async'] as const) {
+      const how = mode === 'declines' ? 'undefined' : 'a promise of undefined';
+
+      scenario(
+        `P1.exceptions.053.${mode}`,
+        `a deprecated @Config.onError returning ${how} declines: the adapter default 500 answers, logged once`,
+        async () => {
+          const defaults = await adapterDefaults(['/exceptions/plain', '/exceptions/http']);
+          const seen = newSeen();
+          const { logger, entries } = recordingLogger();
+          await using app = await bootOrders(
+            seen,
+            [errorHandler(seen, 'declines'), legacyOnErrorConfig(seen, mode)],
+            logger,
+          );
+          const declined = await snapshot(withTimeout(app.get('/exceptions/plain'), 3000, 'declining onError'));
+
+          expect(declined).toEqual(defaults.get('/exceptions/plain')!);
+          expect(declined.status).toBe(500);
+          expect(declined.body).not.toContain(SECRET);
+          expect(seen.calls).toEqual(['error:Error', `config.onError:${SECRET}`]);
+          expect(failureLines(entries, 500).filter((entry) => mentions(entry, SECRET)).length).toBe(1);
+
+          const conflict = await snapshot(app.get('/exceptions/http'));
+
+          expect(conflict).toEqual(defaults.get('/exceptions/http')!);
+          expect(conflict.status).toBe(409);
+          expect((await app.get('/exceptions/ok')).status).toBe(200);
+
+          const alone = newSeen();
+          const lone = recordingLogger();
+          await using direct = await bootOrders(alone, [legacyOnErrorConfig(alone, mode)], lone.logger);
+          const unanswered = await snapshot(
+            withTimeout(direct.get('/exceptions/plain'), 3000, 'declining onError with no @Catch'),
+          );
+
+          expect(unanswered).toEqual(defaults.get('/exceptions/plain')!);
+          expect(alone.calls).toEqual([`config.onError:${SECRET}`]);
+          expect(failureLines(lone.entries, 500).filter((entry) => mentions(entry, SECRET)).length).toBe(1);
+        },
+      );
+
+      scenario(
+        `P1.exceptions.054.${mode}`,
+        `a deprecated @Config.onNotFound returning ${how} declines: the adapter default 404 answers`,
+        async () => {
+          await using plain = await bootOrders(newSeen(), []);
+          const expected = await snapshot(plain.get('/exceptions-unmatched/nowhere'));
+          const seen = newSeen();
+          await using app = await bootOrders(seen, [
+            notFoundHandler(seen, 'declines'),
+            legacyOnNotFoundConfig(seen, mode),
+          ]);
+          const response = await snapshot(
+            withTimeout(app.get('/exceptions-unmatched/nowhere'), 3000, 'declining onNotFound'),
+          );
+
+          expect(response).toEqual(expected);
+          expect(response.status).toBe(404);
+          expect(seen.calls).toEqual([
+            'not-found:GET /exceptions-unmatched/nowhere',
+            'config.onNotFound:/exceptions-unmatched/nowhere',
+          ]);
+          expect((await app.get('/exceptions/ok')).status).toBe(200);
+
+          const alone = newSeen();
+          await using direct = await bootOrders(alone, [legacyOnNotFoundConfig(alone, mode)]);
+          const unanswered = await snapshot(
+            withTimeout(direct.get('/exceptions-unmatched/nowhere'), 3000, 'declining onNotFound with no @NotFound'),
+          );
+
+          expect(unanswered).toEqual(expected);
+          expect(alone.calls).toEqual(['config.onNotFound:/exceptions-unmatched/nowhere']);
+        },
+        { requires: ['optional.notFoundHook'] },
+      );
+    }
 
     scenario(
       'P1.exceptions.060',

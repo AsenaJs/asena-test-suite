@@ -24,6 +24,13 @@ export const CONFLICT_BODY = { error: 'exceptions-conflict' };
 export const MISSING_BODY = { error: 'exceptions-missing-order' };
 export const HANDLER_EXPLODED = 'exceptions-handler-exploded';
 export const THROWN_TEXT = 'exceptions-thrown-text';
+export const THROWN_VALUES: Record<string, unknown> = {
+  number: 42,
+  null: null,
+  undefined: undefined,
+  object: { reason: 'exceptions-thrown-object' },
+  bigint: 7n,
+};
 export const JSON_HEADERS = { 'content-type': 'application/json' };
 
 export class OrderRejectedError extends Error {
@@ -35,12 +42,13 @@ export class OrderRejectedError extends Error {
 
 export interface Seen {
   calls: string[];
+  thrown: unknown[];
   scopes: string[];
   handlerCalls: string[];
 }
 
 export function newSeen(): Seen {
-  return { calls: [], scopes: [], handlerCalls: [] };
+  return { calls: [], thrown: [], scopes: [], handlerCalls: [] };
 }
 
 function nameOf(error: unknown): string {
@@ -117,6 +125,11 @@ export function ordersFixture(seen: Seen, define: (schemas: object) => new (...a
     @Get('/thrown-text')
     public thrownText(): Response {
       throw THROWN_TEXT as unknown;
+    }
+
+    @Get('/thrown/:kind')
+    public thrown(context: Ctx): Response {
+      throw THROWN_VALUES[context.getParam('kind')];
     }
 
     @Get('/ok')
@@ -244,6 +257,7 @@ export function catchAllHandler(seen: Seen, mode: 'answers' | 'declines'): Compo
     @Catch()
     public all(error: unknown, ctx: ExceptionContext<Ctx>) {
       seen.calls.push(`all:${nameOf(error)}:${messageOf(error)}`);
+      seen.thrown.push(error);
 
       if (ctx.scope !== 'http' || mode === 'declines') return undefined;
 
@@ -273,12 +287,21 @@ export function notFoundHandler(seen: Seen, mode: NotFoundMode): Component {
   return ExceptionsNotFoundHandler;
 }
 
-/** A deprecated `@Config.onError`, answering 503. */
-export function legacyOnErrorConfig(seen: Seen): Component {
+export type LegacyMode = 'answers' | 'declines' | 'declines-async';
+
+// AsenaConfig types its hooks as always answering; the adapter receives them as ErrorHandler / NotFoundHandler, which may decline.
+function decline(mode: 'declines' | 'declines-async'): Response {
+  return (mode === 'declines' ? undefined : Promise.resolve(undefined)) as unknown as Response;
+}
+
+/** A deprecated `@Config.onError`, answering 503 or declining with `undefined`. */
+export function legacyOnErrorConfig(seen: Seen, mode: LegacyMode = 'answers'): Component {
   @Config()
   class ExceptionsLegacyOnErrorConfig implements AsenaConfig {
     public onError(error: Error, context: Ctx) {
       seen.calls.push(`config.onError:${error.message}`);
+
+      if (mode !== 'answers') return decline(mode);
 
       return context.send({ by: 'config.onError', message: error.message }, 503);
     }
@@ -287,12 +310,14 @@ export function legacyOnErrorConfig(seen: Seen): Component {
   return ExceptionsLegacyOnErrorConfig;
 }
 
-/** A deprecated `@Config.onNotFound`, answering 404 with its own body. */
-export function legacyOnNotFoundConfig(seen: Seen): Component {
+/** A deprecated `@Config.onNotFound`, answering 404 with its own body or declining with `undefined`. */
+export function legacyOnNotFoundConfig(seen: Seen, mode: LegacyMode = 'answers'): Component {
   @Config()
   class ExceptionsLegacyOnNotFoundConfig implements AsenaConfig {
     public onNotFound(context: Ctx, request: NotFoundRequest) {
       seen.calls.push(`config.onNotFound:${request.path}`);
+
+      if (mode !== 'answers') return decline(mode);
 
       return context.send({ by: 'config.onNotFound', path: request.path }, 404);
     }
