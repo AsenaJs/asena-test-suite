@@ -56,7 +56,10 @@ scenario(
   'the agent says hello first: the core version, a named adapter, the bound port and the child pid',
   () =>
     withApp('main', async (child, adapter) => {
-      expect(await child.hello()).toEqual({
+      const hello = await child.hello();
+
+      expect(hello).toEqual({
+        serverId: expect.any(String),
         coreVersion: installedCoreVersion(),
         adapter,
         port: child.port,
@@ -64,6 +67,7 @@ scenario(
         transports: [],
       });
       expect(adapter.length).toBeGreaterThan(0);
+      expect(hello.serverId.length).toBeGreaterThan(0);
       await child.snapshot();
       expect(child.messages.slice(0, 2).map((message) => message.type)).toEqual(['hello', 'snapshot']);
     }),
@@ -75,7 +79,9 @@ scenario(
   'the snapshot is the same metadata on every adapter: components, routes, schedules, handlers and config',
   () =>
     withApp('main', async (child) => {
-      expect(await child.snapshot()).toEqual(appSnapshot);
+      const { serverId } = await child.hello();
+
+      expect(await child.snapshot()).toEqual({ ...appSnapshot, serverId });
     }),
   opts,
 );
@@ -85,8 +91,10 @@ scenario(
   'an entry that passes explicit components still gets the agent, and its snapshot follows that list',
   () =>
     withApp('main.explicit', async (child) => {
-      expect((await child.hello()).port).toBe(child.port);
-      expect(await child.snapshot()).toEqual(explicitSnapshot);
+      const { port, serverId } = await child.hello();
+
+      expect(port).toBe(child.port);
+      expect(await child.snapshot()).toEqual({ ...explicitSnapshot, serverId });
     }),
   opts,
 );
@@ -237,14 +245,18 @@ scenario(
   'runSchedule runs the job in the app, answers commandResult and records the run with its output; an unknown job answers ok false',
   () =>
     withApp('main', async (child) => {
+      const { serverId } = await child.hello();
+
       expect(await child.command({ command: 'runSchedule', name: 'NoteCleanup' })).toEqual({
         id: expect.any(String),
+        serverId,
         ok: true,
         result: { ran: 'NoteCleanup' },
       });
       await waitFor(() => child.output().includes(CLEANUP_MARKER), { label: 'the job ran in the app' });
       expect(child.requests().filter((record) => record.method === '@Schedule')).toEqual([
         expect.objectContaining({
+          serverId,
           path: 'NoteCleanup',
           status: 200,
           steps: [step('controller', 'NoteCleanup.execute')],
@@ -255,6 +267,7 @@ scenario(
 
       expect(await child.command({ command: 'runSchedule', name: 'NoteArchive' })).toEqual({
         id: expect.any(String),
+        serverId,
         ok: false,
         error: { name: 'Error', message: expect.stringContaining('NoteArchive') },
       });
@@ -314,6 +327,85 @@ scenario(
     expect((await attached.hello()).port).toBe(attached.port);
     expect((await attached.fetch('GET', '/status')).record.status).toBe(200);
     expect(devtoolsWarnings(attached)).toEqual([]);
+  },
+  opts,
+);
+
+scenario(
+  id('032'),
+  'two servers in one process report under their own server ids, and a command addressed to the older one runs there',
+  async () => {
+    await using child = await AgentChild.spawn('main.pair');
+    const [older, newer] = await child.hellos(2);
+    const cleanup = { command: 'runSchedule', name: 'NoteCleanup' } as const;
+
+    expect([older.port, newer.port]).toEqual([child.port, child.secondPort]);
+    expect(older.serverId.length).toBeGreaterThan(0);
+    expect(newer.serverId.length).toBeGreaterThan(0);
+    expect(newer.serverId).not.toBe(older.serverId);
+
+    await waitFor(() => child.snapshots().length >= 2, { label: 'a snapshot per server' });
+    expect(child.snapshots().map((snapshot) => snapshot.serverId)).toEqual([older.serverId, newer.serverId]);
+    expect(child.snapshots()[0]).toEqual({ ...explicitSnapshot, serverId: older.serverId });
+    expect(child.snapshots()[1].schedules).toEqual([]);
+    expect([...new Set(child.snapshots()[1].routes.map((route) => route.controller))]).toEqual(['DraftController']);
+
+    const onOlder = await child.fetch('GET', '/status');
+    const onNewer = await child.fetch('GET', '/drafts/search', undefined, child.secondPort);
+    const unmatched = await child.fetch('GET', '/status/', undefined, child.secondPort);
+
+    expect({
+      status: onOlder.status,
+      serverId: onOlder.record.serverId,
+      answeredBy: onOlder.record.answeredBy,
+    }).toEqual({ status: 200, serverId: older.serverId, answeredBy: step('controller', 'StatusController.read') });
+    expect({
+      status: onNewer.status,
+      serverId: onNewer.record.serverId,
+      answeredBy: onNewer.record.answeredBy,
+    }).toEqual({ status: 422, serverId: newer.serverId, answeredBy: step('config-onError', 'DraftConfig.onError') });
+    expect({
+      status: unmatched.status,
+      serverId: unmatched.record.serverId,
+      answeredBy: unmatched.record.answeredBy,
+    }).toEqual({ status: 404, serverId: newer.serverId, answeredBy: step('adapter-default', String(newer.adapter)) });
+
+    expect(await child.command(cleanup, older.serverId)).toEqual({
+      id: expect.any(String),
+      serverId: older.serverId,
+      ok: true,
+      result: { ran: 'NoteCleanup' },
+    });
+    await waitFor(() => child.output().includes(CLEANUP_MARKER), { label: 'the job ran in the app' });
+    expect(
+      child
+        .requests()
+        .filter((record) => record.method === '@Schedule')
+        .map((record) => ({ serverId: record.serverId, path: record.path, status: record.status })),
+    ).toEqual([{ serverId: older.serverId, path: 'NoteCleanup', status: 200 }]);
+
+    expect(await child.command(cleanup)).toEqual({
+      id: expect.any(String),
+      serverId: newer.serverId,
+      ok: false,
+      error: { name: 'Error', message: expect.stringContaining('NoteCleanup') },
+    });
+
+    const stray = await child.command(cleanup, `${older.serverId}-${newer.serverId}`);
+
+    expect({ ok: stray.ok, answeredBy: stray.serverId }).toEqual({ ok: false, answeredBy: undefined });
+
+    const sample = await waitFor(() => child.metrics().find((metrics) => Object.keys(metrics.servers).length === 2), {
+      label: 'a metrics sample naming both servers',
+      timeout: 5000,
+    });
+
+    expect(Object.keys(sample.servers).sort()).toEqual([older.serverId, newer.serverId].sort());
+    expect(Object.values(sample.servers).map((server) => server.readiness.status)).toEqual(['up', 'up']);
+
+    const exit = await child.stop();
+
+    expect({ code: exit.code, signal: exit.signal }).toEqual({ code: 0, signal: null });
   },
   opts,
 );

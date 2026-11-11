@@ -7,7 +7,9 @@ import {
   type DevtoolsCommand,
   type DevtoolsCommandResult,
   type DevtoolsHello,
+  type DevtoolsMetrics,
   type DevtoolsRequestRecord,
+  type DevtoolsServerRef,
   type DevtoolsSnapshot,
   hostMessage,
   isDevtoolsAgentMessage,
@@ -20,7 +22,10 @@ const ECOSYSTEM_DIR = join(import.meta.dir, '..', '..', '..');
 const FIXTURES_DIR = join(import.meta.dir, '..', 'fixtures');
 const ATTEMPTS = 3;
 
-export type FixtureEntry = 'main' | 'main.explicit' | 'main.drafts' | 'main.warnings';
+export type FixtureEntry = 'main' | 'main.explicit' | 'main.drafts' | 'main.warnings' | 'main.pair';
+
+export type ServerSnapshot = DevtoolsSnapshot & DevtoolsServerRef;
+export type ServerRecord = DevtoolsRequestRecord & DevtoolsServerRef;
 
 export interface SpawnOptions {
   env?: Record<string, string>;
@@ -47,11 +52,11 @@ export function installedCoreVersion(): string {
   return (JSON.parse(readFileSync(join(dirname(entry), '..', 'package.json'), 'utf8')) as { version: string }).version;
 }
 
-async function freePort(): Promise<number> {
+async function freePort(taken?: number): Promise<number> {
   for (let attempt = 0; attempt < 50; attempt++) {
     const port = randomPort();
 
-    if (await isPortFree(port)) return port;
+    if (port !== taken && (await isPortFree(port))) return port;
   }
 
   throw new Error('no free port in 10000-31999');
@@ -103,13 +108,21 @@ export class AgentChild implements AsyncDisposable {
 
   private constructor(
     public readonly port: number,
+    /** Where the second server of the `main.pair` entry listens. */
+    public readonly secondPort: number,
     private readonly dir: string,
     wrapper: string,
     env: Record<string, string> = {},
   ) {
     this.proc = Bun.spawn([process.execPath, `--tsconfig-override=${join(ECOSYSTEM_DIR, 'tsconfig.json')}`, wrapper], {
       cwd: ECOSYSTEM_DIR,
-      env: { ...process.env, DEVTOOLS_FIXTURE_PORT: String(port), DEVTOOLS_FIXTURE_PAGE_SIZE: undefined, ...env },
+      env: {
+        ...process.env,
+        DEVTOOLS_FIXTURE_PORT: String(port),
+        DEVTOOLS_FIXTURE_SECOND_PORT: String(secondPort),
+        DEVTOOLS_FIXTURE_PAGE_SIZE: undefined,
+        ...env,
+      },
       stdin: 'ignore',
       stdout: 'pipe',
       stderr: 'pipe',
@@ -127,7 +140,8 @@ export class AgentChild implements AsyncDisposable {
 
     for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
       const dir = mkdtempSync(join(tmpdir(), 'asena-suite-devtools-'));
-      const child = new AgentChild(await freePort(), dir, writeWrapper(dir, entry), options.env);
+      const port = await freePort();
+      const child = new AgentChild(port, await freePort(port), dir, writeWrapper(dir, entry), options.env);
 
       try {
         await (options.ready === 'http' ? child.serving() : child.hello());
@@ -160,12 +174,32 @@ export class AgentChild implements AsyncDisposable {
     return (await this.first('hello')).payload as DevtoolsHello;
   }
 
-  public async snapshot(): Promise<DevtoolsSnapshot> {
-    return (await this.first('snapshot')).payload as DevtoolsSnapshot;
+  public async snapshot(): Promise<ServerSnapshot> {
+    return (await this.first('snapshot')).payload as ServerSnapshot;
   }
 
-  /** Records the agent sent for HTTP requests, in arrival order. */
-  public requests(): DevtoolsRequestRecord[] {
+  /** The first `count` hellos, one per server, in the order the servers attached. */
+  public async hellos(count: number): Promise<DevtoolsHello[]> {
+    return waitFor(
+      () => {
+        const found = this.messages.flatMap((message) => (message.type === 'hello' ? [message.payload] : []));
+
+        return found.length >= count ? found.slice(0, count) : undefined;
+      },
+      { label: `${count} hellos from the agent`, timeout: 15_000 },
+    );
+  }
+
+  public snapshots(): ServerSnapshot[] {
+    return this.messages.flatMap((message) => (message.type === 'snapshot' ? [message.payload] : []));
+  }
+
+  public metrics(): DevtoolsMetrics[] {
+    return this.messages.flatMap((message) => (message.type === 'metrics' ? [message.payload] : []));
+  }
+
+  /** Records the agent sent, in arrival order. */
+  public requests(): ServerRecord[] {
     return this.messages.flatMap((message) => (message.type === 'request' ? [message.payload] : []));
   }
 
@@ -177,8 +211,9 @@ export class AgentChild implements AsyncDisposable {
     method: string,
     path: string,
     body?: unknown,
-  ): Promise<{ status: number; body: string; record: DevtoolsRequestRecord }> {
-    const response = await fetch(`http://127.0.0.1:${this.port}${path}`, {
+    port = this.port,
+  ): Promise<{ status: number; body: string; record: ServerRecord }> {
+    const response = await fetch(`http://127.0.0.1:${port}${path}`, {
       method,
       ...(body === undefined ? {} : { headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }),
     });
@@ -205,17 +240,17 @@ export class AgentChild implements AsyncDisposable {
     return response.status;
   }
 
-  /** Sends a command without waiting for its result. */
-  public post(command: DevtoolsCommand): string {
+  /** Sends a command without waiting for its result; with `serverId`, addressed to that server. */
+  public post(command: DevtoolsCommand, serverId?: string): string {
     const id = `suite-${++this.commands}`;
 
-    this.proc.send(hostMessage('command', { id, ...command }));
+    this.proc.send(hostMessage('command', { id, ...(serverId === undefined ? {} : { serverId }), ...command }));
 
     return id;
   }
 
-  public async command(command: DevtoolsCommand): Promise<DevtoolsCommandResult> {
-    const id = this.post(command);
+  public async command(command: DevtoolsCommand, serverId?: string): Promise<DevtoolsCommandResult> {
+    const id = this.post(command, serverId);
 
     let result: DevtoolsCommandResult | undefined;
 
