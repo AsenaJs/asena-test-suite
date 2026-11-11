@@ -2,6 +2,7 @@ import { type AsenaServer, AsenaServerFactory } from '@asenajs/asena';
 import { Config } from '@asenajs/asena/decorators';
 import type { AsenaConfig } from '@asenajs/asena/server/config';
 import { getDescriptor } from '@asenajs/adapter-conformance';
+import { BookingErrors } from './services/booking/BookingErrors.ts';
 import { BookingMessageController } from './services/booking/BookingMessageController.ts';
 import { BookingStore } from './services/booking/BookingStore.ts';
 import { BookingGatewayController } from './services/gateway/BookingGatewayController.ts';
@@ -29,6 +30,7 @@ export async function createMemoryApp(options?: { httpPort?: number; healthPort?
     components: [
       MemoryConfig,
       BookingStore,
+      BookingErrors,
       BookingMessageController,
       NotificationController,
       InventoryController,

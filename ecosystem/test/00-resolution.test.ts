@@ -12,6 +12,7 @@ const ECOSYSTEM_PACKAGES = [
   '@asenajs/asena-otel',
   '@asenajs/asena-openapi',
   '@asenajs/asena-cli',
+  '@asenajs/asena-auth',
 ];
 
 function coreFrom(from: string): string {

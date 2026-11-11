@@ -1,6 +1,7 @@
 import { register as registerBuiltins } from './areas/builtins/scenarios.ts';
 import { register as registerContext } from './areas/context/scenarios.ts';
 import { register as registerErrors } from './areas/errors/scenarios.ts';
+import { register as registerExceptions } from './areas/exceptions/scenarios.ts';
 import { register as registerHarness } from './areas/harness/scenarios.ts';
 import { register as registerLifecycle } from './areas/lifecycle/scenarios.ts';
 import { register as registerMiddleware } from './areas/middleware/scenarios.ts';
@@ -21,6 +22,7 @@ export function runConformance(descriptor: AdapterDescriptor): void {
   registerSmoke();
   registerRouting();
   registerErrors();
+  registerExceptions();
   registerContext();
   registerMiddleware();
   registerValidation();

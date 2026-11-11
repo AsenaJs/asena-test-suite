@@ -2,6 +2,7 @@ import { afterAll, beforeAll, beforeEach, expect } from 'bun:test';
 import { UlakError, UlakErrorCode } from '@asenajs/asena/messaging';
 import { area, scenario, type ScenarioOptions } from '@asenajs/adapter-conformance';
 import { waitFor } from '@asenajs/adapter-conformance/helpers';
+import { REFUSAL_DETAIL, REFUSAL_PUBLIC, type RefusalOutcome } from '../src/services/booking/BookingErrors.ts';
 import type { TransportTestBed } from './helpers/testbed.ts';
 
 type Services = NonNullable<ScenarioOptions['services']>;
@@ -339,6 +340,37 @@ export function runTransportContractSuite(
           },
           { timeout: timing.waitForMs, interval: 25, label: 'emit headers arrived in the event handler context' },
         );
+      },
+      opts,
+    );
+
+    scenario(
+      id('C14'),
+      'a @Catch decides what the caller of a failed @MessagePattern sees: its own error, a reply, null, or the original failure',
+      async () => {
+        const refuse = (outcome: RefusalOutcome) =>
+          bed.clientSend('booking.refuse', { outcome }, rpc).then(
+            (reply: unknown) => ({ reply }),
+            (thrown: unknown) => ({ thrown }),
+          );
+
+        const replaced = (await refuse('replace')) as { thrown: UlakError };
+
+        expect(replaced.thrown).toBeInstanceOf(UlakError);
+        expect(replaced.thrown.code).toBe(UlakErrorCode.REMOTE_ERROR);
+        expect(replaced.thrown.message).toContain(REFUSAL_PUBLIC);
+        expect(replaced.thrown.message).not.toContain(REFUSAL_DETAIL);
+
+        expect(await refuse('reply')).toEqual({ reply: { refused: true, source: 'BookingMessageController.refuse' } });
+        expect(await refuse('null')).toEqual({ reply: null });
+
+        const declined = (await refuse('decline')) as { thrown: UlakError };
+
+        expect(declined.thrown).toBeInstanceOf(UlakError);
+        expect(declined.thrown.code).toBe(UlakErrorCode.REMOTE_ERROR);
+        expect(declined.thrown.message).toContain(REFUSAL_DETAIL);
+
+        expect((await bed.clientSend<{ headers: object }>('booking.echoHeaders', {}, rpc)).headers).toBeDefined();
       },
       opts,
     );

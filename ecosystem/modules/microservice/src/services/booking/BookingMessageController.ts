@@ -4,6 +4,7 @@ import { EventPattern, MessagePattern } from '@asenajs/asena/microservice';
 import type { MessageContext } from '@asenajs/asena/microservice';
 import { ulak } from '@asenajs/asena/messaging';
 import type { Ulak } from '@asenajs/asena/messaging';
+import { BookingRefusedError, type RefusalOutcome } from './BookingErrors';
 import { BookingStore } from './BookingStore';
 import type { CreateBookingDto } from '../../domain/types';
 
@@ -78,6 +79,12 @@ export class BookingMessageController {
     }
 
     return { pid: process.pid, attempt: context.attempt };
+  }
+
+  // C14 fixture: always fails; BookingErrors decides what the caller sees
+  @MessagePattern('refuse')
+  public async refuse(data: { outcome: RefusalOutcome }): Promise<never> {
+    throw new BookingRefusedError(data?.outcome);
   }
 
   @MessagePattern('dump')

@@ -1,7 +1,7 @@
 # @asenajs/adapter-conformance
 
 The adapter conformance suite for [AsenaJS](https://asena.sh). It boots real Asena applications on your `AsenaAdapter`
-implementation and checks that routing, errors, the `AsenaContext` surface, middleware, validation, streaming, static files,
+implementation and checks that routing, errors, the `@ExceptionHandler` chain, the `AsenaContext` surface, middleware, validation, streaming, static files,
 WebSockets, lifecycle, the core test harness and the optional built-ins behave the way Asena expects. Every scenario has a
 stable ID such as `[P1.routing.040]`.
 
@@ -14,7 +14,7 @@ network and no configuration besides one descriptor file.
 bun add -d @asenajs/adapter-conformance
 ```
 
-Peers: `@asenajs/asena` (`^0.12.0`, which your adapter already peers) and, optionally, `zod`. Add `zod` only if your adapter
+Peers: `@asenajs/asena` (`^0.13.0`, which your adapter already peers) and, optionally, `zod`. Add `zod` only if your adapter
 supports zod schemas as its legacy validator dialect (`optional.zodValidator: true` below); nothing else in the suite needs it.
 
 Requires Bun `>= 1.4.0`.
@@ -132,12 +132,12 @@ your adapter really does not provide the feature; its scenarios are then reporte
 
 | Flag | Why it is optional (core 0.12) | Scenarios it gates |
 |---|---|---|
-| `optional.notFoundHook` | `AsenaAdapter.onNotFound?` (`lib/adapter/AsenaAdapter.ts`) | P1.routing.050-051, P1.static.008, P1.static.013-014, P1.static.016-017 |
+| `optional.notFoundHook` | `AsenaAdapter.onNotFound?` (`lib/adapter/AsenaAdapter.ts`) | P1.routing.050-051, P1.exceptions.040-042, P1.exceptions.052, P1.exceptions.054.\*, P1.static.008, P1.static.013-014, P1.static.016-017 |
 | `optional.unixSocket` | `AsenaStartOptions.unix?` (`lib/adapter/types/ServeOptions.ts`; adapters may ignore start options they do not support) | P1.lifecycle.004, P1.harness.020 |
 | `optional.routePattern` | `AsenaContext.routePattern?` (`lib/adapter/AsenaContext.ts`) | P1.routing.070-071, P1.static.013 |
 | `optional.requestIp` | `AsenaContext.getRequestIp?` (`lib/adapter/AsenaContext.ts`) | P1.context.062 |
 | `optional.responseHeaders` | `AsenaContext.setResponseHeader?` and `appendResponseHeader?` (`lib/adapter/AsenaContext.ts`) | P1.context.060-061, P1.streaming.020 |
-| `optional.zodValidator` | not a member: the legacy validator dialect is the adapter's `VS` type parameter (`AsenaAdapter<C, VS>`), zod is one dialect | P1.validation.001-010, P1.smoke.002, P1.errors.042, P1.middleware.010, P1.harness.011 |
+| `optional.zodValidator` | not a member: the legacy validator dialect is the adapter's `VS` type parameter (`AsenaAdapter<C, VS>`), zod is one dialect | P1.validation.001-010, P1.smoke.002, P1.errors.042, P1.exceptions.014, P1.middleware.010, P1.harness.011 |
 | `optional.builtinCors` | not a member: built-in middlewares are adapter extras | P1.builtins.001-007, P1.smoke.004 (also need `builtins.cors`) |
 | `optional.builtinRateLimiter` | not a member: built-in middlewares are adapter extras | P1.builtins.010-013 (also need `builtins.rateLimiter`) |
 
@@ -190,7 +190,7 @@ These run first and explain most broken setups:
 |---|---|---|
 | `P1.resolution.001` | one `@asenajs/asena` copy: the package's and your adapter's resolve to the same file | a second core (for example a nested `node_modules/@asenajs/asena` under a linked package); dedupe so that only your repo's peer copy remains, and check `packageRoot` |
 | `P1.resolution.002` | a `@PostConstruct` hook runs in an app booted with your adapter | the DI container silently does nothing, almost always because of two core copies (see 001) |
-| `P1.resolution.003` | the installed core satisfies this package's peer range (`^0.12.0`) | upgrade `@asenajs/asena` in your repo |
+| `P1.resolution.003` | the installed core satisfies this package's peer range (`^0.13.0`) | upgrade `@asenajs/asena` in your repo |
 | `P1.resolution.004` | the package's own fixtures carry legacy decorator metadata | `NOT-CONFIGURED: ...` means this package was built without `experimentalDecorators`/`emitDecoratorMetadata`; that is a broken release of this package, not your setup - please report it |
 | `P1.resolution.010` | the descriptor carries no divergence flags or unknown keys | `NOT-CONFORMANT: ...`, see above |
 

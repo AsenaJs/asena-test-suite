@@ -29,7 +29,7 @@ export interface ConformanceRateLimiterOptions {
 }
 
 /** Maintainer bookkeeping for first-party adapters. Not part of AdapterDescriptor; not exported from the package index. */
-export type DivergenceFlag = never;
+export type DivergenceFlag = 'routing.unslashedPathIsServed';
 
 export type CapabilityFlag = OptionalFlag | DivergenceFlag;
 

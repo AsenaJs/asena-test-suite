@@ -348,7 +348,12 @@ export function register(): void {
         const fixture = notFoundFixture();
         await using app = await bootApp({ components: fixture.components, adapter: recorded.adapter, logger });
 
-        const warnings = entries.filter((entry) => entry.level === 'warn' && entry.message.includes('onNotFound'));
+        const warnings = entries.filter(
+          (entry) =>
+            entry.level === 'warn' &&
+            entry.message.includes('onNotFound') &&
+            entry.message.includes('does not support'),
+        );
 
         expect(warnings.length).toBe(1);
 
