@@ -2,7 +2,15 @@ import { expect } from 'bun:test';
 import type { DevtoolsRequestStep, DevtoolsStepKind } from '@asenajs/asena/devtools';
 import { scenario } from '@asenajs/adapter-conformance';
 import { waitFor } from '@asenajs/adapter-conformance/helpers';
-import { CLEANUP_MARKER, FLOOD_CHUNK, FLOOD_LINES, LATE_MARKER, floodLine, talkOutput } from './fixtures/app.ts';
+import {
+  CLEANUP_MARKER,
+  FLOOD_CHUNK,
+  FLOOD_LINES,
+  LATE_MARKER,
+  WARNING_PREFIX,
+  floodLine,
+  talkOutput,
+} from './fixtures/app.ts';
 import { appSnapshot, explicitSnapshot } from './fixtures/snapshot.ts';
 import { AgentChild, type FixtureEntry, installedCoreVersion } from './harness/agentChild.ts';
 
@@ -266,6 +274,46 @@ scenario(
 
     expect({ code: exit.code, signal: exit.signal }).toEqual({ code: 0, signal: null });
     expect(exit.afterMs).toBeLessThan(3000);
+  },
+  opts,
+);
+
+scenario(
+  id('031'),
+  'under NODE_ENV=production the app serves but the agent stays off: no message, no command run, one warning saying why',
+  async () => {
+    const devtoolsWarnings = (child: AgentChild) =>
+      child
+        .output()
+        .split('\n')
+        .filter((line) => line.startsWith(WARNING_PREFIX) && line.includes('devtools agent'));
+
+    await using child = await AgentChild.spawn('main.warnings', { env: { NODE_ENV: 'production' }, ready: 'http' });
+
+    expect(await child.status('GET', '/status')).toBe(200);
+    expect(await child.status('GET', '/notes/late')).toBe(200);
+    expect(await child.status('GET', '/notes/missing')).toBe(404);
+    expect(await child.status('GET', '/notes/broken')).toBe(500);
+    expect(await child.status('GET', '/nowhere')).toBe(404);
+    await waitFor(() => child.output().includes(LATE_MARKER.after), { label: 'app output on the real stream' });
+
+    child.post({ command: 'runSchedule', name: 'NoteCleanup' });
+    // A metrics sample is due every second: long enough for one to have been sent if the agent were on.
+    await Bun.sleep(1500);
+
+    expect(child.messages).toEqual([]);
+    expect(child.output()).not.toContain(CLEANUP_MARKER);
+    expect(devtoolsWarnings(child)).toEqual([expect.stringContaining('NODE_ENV is production')]);
+
+    const exit = await child.stop();
+
+    expect({ code: exit.code, signal: exit.signal }).toEqual({ code: 0, signal: null });
+
+    await using attached = await AgentChild.spawn('main.warnings');
+
+    expect((await attached.hello()).port).toBe(attached.port);
+    expect((await attached.fetch('GET', '/status')).record.status).toBe(200);
+    expect(devtoolsWarnings(attached)).toEqual([]);
   },
   opts,
 );

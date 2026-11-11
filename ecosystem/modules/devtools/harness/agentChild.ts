@@ -20,7 +20,13 @@ const ECOSYSTEM_DIR = join(import.meta.dir, '..', '..', '..');
 const FIXTURES_DIR = join(import.meta.dir, '..', 'fixtures');
 const ATTEMPTS = 3;
 
-export type FixtureEntry = 'main' | 'main.explicit' | 'main.drafts';
+export type FixtureEntry = 'main' | 'main.explicit' | 'main.drafts' | 'main.warnings';
+
+export interface SpawnOptions {
+  env?: Record<string, string>;
+  /** What tells the child is up: the agent's hello, or the app answering HTTP when no agent is expected. */
+  ready?: 'hello' | 'http';
+}
 
 export interface ChildExit {
   code: number | null;
@@ -99,10 +105,11 @@ export class AgentChild implements AsyncDisposable {
     public readonly port: number,
     private readonly dir: string,
     wrapper: string,
+    env: Record<string, string> = {},
   ) {
     this.proc = Bun.spawn([process.execPath, `--tsconfig-override=${join(ECOSYSTEM_DIR, 'tsconfig.json')}`, wrapper], {
       cwd: ECOSYSTEM_DIR,
-      env: { ...process.env, DEVTOOLS_FIXTURE_PORT: String(port), DEVTOOLS_FIXTURE_PAGE_SIZE: undefined },
+      env: { ...process.env, DEVTOOLS_FIXTURE_PORT: String(port), DEVTOOLS_FIXTURE_PAGE_SIZE: undefined, ...env },
       stdin: 'ignore',
       stdout: 'pipe',
       stderr: 'pipe',
@@ -115,15 +122,15 @@ export class AgentChild implements AsyncDisposable {
     void this.consume(this.proc.stderr);
   }
 
-  public static async spawn(entry: FixtureEntry): Promise<AgentChild> {
+  public static async spawn(entry: FixtureEntry, options: SpawnOptions = {}): Promise<AgentChild> {
     let last: AgentChild | undefined;
 
     for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
       const dir = mkdtempSync(join(tmpdir(), 'asena-suite-devtools-'));
-      const child = new AgentChild(await freePort(), dir, writeWrapper(dir, entry));
+      const child = new AgentChild(await freePort(), dir, writeWrapper(dir, entry), options.env);
 
       try {
-        await child.hello();
+        await (options.ready === 'http' ? child.serving() : child.hello());
 
         return child;
       } catch (error) {
@@ -189,10 +196,26 @@ export class AgentChild implements AsyncDisposable {
     return { status: response.status, body: text, record };
   }
 
-  public async command(command: DevtoolsCommand): Promise<DevtoolsCommandResult> {
+  /** One request with no record awaited, for an app whose agent is not expected to report. */
+  public async status(method: string, path: string): Promise<number> {
+    const response = await fetch(`http://127.0.0.1:${this.port}${path}`, { method });
+
+    await response.text();
+
+    return response.status;
+  }
+
+  /** Sends a command without waiting for its result. */
+  public post(command: DevtoolsCommand): string {
     const id = `suite-${++this.commands}`;
 
     this.proc.send(hostMessage('command', { id, ...command }));
+
+    return id;
+  }
+
+  public async command(command: DevtoolsCommand): Promise<DevtoolsCommandResult> {
+    const id = this.post(command);
 
     let result: DevtoolsCommandResult | undefined;
 
@@ -239,6 +262,32 @@ export class AgentChild implements AsyncDisposable {
     }
 
     return { code: this.proc.exitCode, signal: this.proc.signalCode, afterMs: performance.now() - sent };
+  }
+
+  private async serving(): Promise<void> {
+    const found = await waitFor(
+      async () => {
+        if (this.proc.exitCode !== null || this.proc.signalCode !== null) return 'exited';
+
+        return fetch(`http://127.0.0.1:${this.port}/status`).then(
+          async (response) => {
+            await response.text();
+
+            return 'up';
+          },
+          () => undefined,
+        );
+      },
+      { label: 'the fixture answering HTTP', timeout: 15_000, interval: 25 },
+    ).catch((error: unknown) => {
+      throw new Error(`${(error as Error).message}\n--- fixture output ---\n${this.output()}`, { cause: error });
+    });
+
+    if (found === 'exited') {
+      throw new Error(
+        `fixture exited (${this.proc.exitCode ?? this.proc.signalCode}) before serving:\n${this.output()}`,
+      );
+    }
   }
 
   private async first(type: DevtoolsAgentMessage['type']): Promise<DevtoolsAgentMessage> {

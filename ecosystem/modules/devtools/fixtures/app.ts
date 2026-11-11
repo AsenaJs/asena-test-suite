@@ -13,6 +13,9 @@ type Ctx = AsenaContext<any, any>;
 
 export const CLEANUP_MARKER = 'devtools-fixture: NoteCleanup ran';
 
+/** What the `main.warnings` entry puts in front of every warning the server logs. */
+export const WARNING_PREFIX = 'devtools-fixture warn: ';
+
 /** What `GET /notes/talk/:tag` writes, in order, and to which stream. */
 export const talkOutput = (tag: string): Omit<DevtoolsRequestLog, 'at'>[] => [
   { stream: 'stdout', text: `devtools-fixture: talk ${tag} arrived\n` },
