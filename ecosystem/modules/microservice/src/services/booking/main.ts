@@ -4,6 +4,7 @@ import { env } from '../../shared/env';
 import { logger } from '../../shared/logger';
 import { buildTransportConfig } from '../../shared/buildTransport';
 import { installSignalHandlers } from '../../shared/lifecycle';
+import { BookingErrors } from './BookingErrors';
 import { BookingStore } from './BookingStore';
 import { BookingMessageController } from './BookingMessageController';
 
@@ -18,7 +19,7 @@ const server = await AsenaServerFactory.create({
   headless: true,
   logger,
   shutdown: { signals: false },
-  components: [BookingConfig, BookingStore, BookingMessageController],
+  components: [BookingConfig, BookingStore, BookingErrors, BookingMessageController],
   health: { port: env.HEALTH_PORT },
 });
 
