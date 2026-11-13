@@ -1,2 +1,15 @@
 [install]
 saveTextLockfile = true
+
+[fmt]
+printWidth = 120
+singleQuote = true
+ignorePatterns = [
+  "bun.lock",
+  "*.md",
+  "**/fixtures/**/*.html",
+  "**/fixtures/**/*.css",
+  "**/fixtures/**/*.json",
+  "**/fixtures/**/*.txt",
+  "tools/validate/fixtures",
+]

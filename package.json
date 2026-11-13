@@ -10,8 +10,8 @@
     "typecheck": "tsc --noEmit -p .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "bun fmt",
+    "format:check": "bun fmt --check",
     "check": "bun run lint && bun run format:check",
     "check:fix": "bun run lint:fix && bun run format",
     "test:p1": "bun --cwd=packages/conformance test ./test/",
@@ -31,7 +31,6 @@
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "hono": ">=4.12.9",
-    "prettier": "^3.9.10",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.72.1",
     "zod": "^4.3.6"
