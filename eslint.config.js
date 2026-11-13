@@ -12,7 +12,6 @@ export default tseslint.config(
       '.local-packs/**',
       'tools/validate/fixtures/**',
       '*.config.js',
-      '.prettierrc.js',
     ],
   },
   eslint.configs.recommended,
