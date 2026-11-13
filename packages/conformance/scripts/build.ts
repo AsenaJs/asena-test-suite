@@ -1,5 +1,4 @@
 import { cpSync, mkdirSync, rmSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 
 const pkgRoot = join(import.meta.dir, '..');
@@ -8,11 +7,7 @@ const distDir = join(pkgRoot, 'dist');
 
 rmSync(distDir, { recursive: true, force: true });
 
-const tscBin = join(
-  dirname(createRequire(join(pkgRoot, 'package.json')).resolve('@typescript/native/package.json')),
-  'bin',
-  'tsc',
-);
+const tscBin = join(pkgRoot, '..', '..', 'node_modules', '.bin', 'tsc');
 const tsc = Bun.spawnSync([process.execPath, tscBin, '-p', join(pkgRoot, 'tsconfig.build.json')], {
   cwd: pkgRoot,
   stdout: 'inherit',
