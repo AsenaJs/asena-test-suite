@@ -8,7 +8,11 @@ const distDir = join(pkgRoot, 'dist');
 
 rmSync(distDir, { recursive: true, force: true });
 
-const tscBin = createRequire(join(pkgRoot, 'package.json')).resolve('typescript/bin/tsc');
+const tscBin = join(
+  dirname(createRequire(join(pkgRoot, 'package.json')).resolve('@typescript/native/package.json')),
+  'bin',
+  'tsc',
+);
 const tsc = Bun.spawnSync([process.execPath, tscBin, '-p', join(pkgRoot, 'tsconfig.build.json')], {
   cwd: pkgRoot,
   stdout: 'inherit',
