@@ -30,7 +30,6 @@ sortImports = false
 jsdoc = false
 sortTailwindcss = false
 sortPackageJson = false
-flavor = "prettier"
 ignorePatterns = [
   "bun.lock",
   "*.md",
