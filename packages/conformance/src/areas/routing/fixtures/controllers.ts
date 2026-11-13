@@ -119,6 +119,11 @@ export function paramsFixture(): Component[] {
     public two(context: Ctx) {
       return context.send({ group: context.getParam('group'), id: context.getParam('id') });
     }
+
+    @Get('/undeclared/:id')
+    public undeclared(context: Ctx) {
+      return context.send({ id: context.getParam('id'), other: context.getParam('other') });
+    }
   }
 
   return [RoutingParamsController];
