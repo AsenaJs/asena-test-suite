@@ -4,6 +4,9 @@ saveTextLockfile = true
 [fmt]
 printWidth = 120
 singleQuote = true
+tabWidth = 2
+useTabs = false
+endOfLine = "lf"
 ignorePatterns = [
   "bun.lock",
   "*.md",
