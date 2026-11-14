@@ -303,6 +303,20 @@ function prepareNpm(packageName: string, version: string, project: string, tmp: 
   return exec([process.execPath, 'install'], project);
 }
 
+export function consumerCompiler(manifest: Record<string, any>): { install: string[]; bin: string } {
+  const typescript = manifest.devDependencies?.typescript ?? manifest.peerDependencies?.typescript ?? 'latest';
+  const native = manifest.devDependencies?.['@typescript/native'];
+
+  if (native === undefined) {
+    return { install: [`typescript@${typescript}`], bin: join('node_modules', 'typescript', 'bin', 'tsc') };
+  }
+
+  return {
+    install: [`typescript@${typescript}`, `@typescript/native@${native}`],
+    bin: join('node_modules', '@typescript/native', 'bin', 'tsc'),
+  };
+}
+
 function locateReport(project: string, requested: string): string | undefined {
   if (existsSync(requested)) return requested;
 
@@ -354,14 +368,9 @@ async function runLeg(
   }
 
   const manifest = readJson(join(project, 'package.json'));
-  const typescript = (manifest.devDependencies?.typescript ??
-    manifest.peerDependencies?.typescript ??
-    'latest') as string;
+  const compiler = consumerCompiler(manifest);
   const typesBun = installedVersion(root, '@types/bun');
-  const add = exec(
-    [process.execPath, 'add', '-d', tarball, `typescript@${typescript}`, `@types/bun@${typesBun}`],
-    project,
-  );
+  const add = exec([process.execPath, 'add', '-d', tarball, ...compiler.install, `@types/bun@${typesBun}`], project);
 
   if (!add.ok) return fail('packed-setup', `bun add -d failed:\n${tail(add.output)}`);
 
@@ -379,13 +388,7 @@ async function runLeg(
   writeFileSync(join(project, 'tsconfig.consumer.json'), `${JSON.stringify(CONSUMER_TSCONFIG, null, 2)}\n`);
 
   const tsc = exec(
-    [
-      process.execPath,
-      join(project, 'node_modules', 'typescript', 'bin', 'tsc'),
-      '--noEmit',
-      '-p',
-      'tsconfig.consumer.json',
-    ],
+    [process.execPath, join(project, compiler.bin), '--noEmit', '-p', 'tsconfig.consumer.json'],
     project,
   );
 

@@ -135,6 +135,19 @@ export function register(): void {
       expect(slash.json()).toEqual({ id: 'a/b' });
     });
 
+    scenario(
+      'P1.routing.013',
+      'a parameter name the route does not declare reads as an empty string',
+      async () => {
+        await using app = await bootApp({ components: paramsFixture() });
+        const response = await app.get('/params/undeclared/abc');
+
+        expect(response.status).toBe(200);
+        expect(response.json()).toEqual({ id: 'abc', other: '' });
+      },
+      { requires: ['routing.undeclaredParamIsEmpty'] },
+    );
+
     scenario('P1.routing.020', 'each method decorator answers only its own method', async () => {
       await using app = await bootApp({ components: methodsFixture() });
 

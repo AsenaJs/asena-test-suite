@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { type Case, readJunit } from '../parity.ts';
-import { comparePacked, entryOf, resolveWorkspace } from './run.ts';
+import { comparePacked, consumerCompiler, entryOf, resolveWorkspace } from './run.ts';
 
 const parity = join(import.meta.dir, '..', 'fixtures', 'parity');
 const declared = new Set(['routing.trailingSlashAlias']);
@@ -113,5 +113,28 @@ describe('packed project helpers', () => {
     } finally {
       rmSync(base, { recursive: true, force: true });
     }
+  });
+
+  it('consumerCompiler: a manifest with @typescript/native runs the TS 7 launcher', () => {
+    const compiler = consumerCompiler({
+      devDependencies: {
+        typescript: 'npm:@typescript/typescript6@^6.0.2',
+        '@typescript/native': 'npm:typescript@^7.0.2',
+      },
+    });
+
+    expect(compiler.install).toEqual([
+      'typescript@npm:@typescript/typescript6@^6.0.2',
+      '@typescript/native@npm:typescript@^7.0.2',
+    ]);
+    expect(compiler.bin).toBe(join('node_modules', '@typescript/native', 'bin', 'tsc'));
+  });
+
+  it('consumerCompiler: a manifest without the alias keeps typescript/bin/tsc', () => {
+    expect(consumerCompiler({ devDependencies: { typescript: '^5.9.3' } })).toEqual({
+      install: ['typescript@^5.9.3'],
+      bin: join('node_modules', 'typescript', 'bin', 'tsc'),
+    });
+    expect(consumerCompiler({}).install).toEqual(['typescript@latest']);
   });
 });

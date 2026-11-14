@@ -17,6 +17,7 @@ export const capabilities: Readonly<Record<CapabilityFlag, Readonly<CapabilityEn
     convergence: 'WP-66',
     expectedFailure: /Invalid route "[^"/][^"]*"\. Path must start with '\/'/,
   },
+  'routing.undeclaredParamIsEmpty': { kind: 'divergence', convergence: 'WP-67' },
   'optional.notFoundHook': {
     kind: 'optional',
     description: 'AsenaAdapter.onNotFound is optional; without it a config onNotFound hook is never called.',
