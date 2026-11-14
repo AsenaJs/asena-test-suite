@@ -37,8 +37,6 @@ const descriptor: AdapterDescriptor = {
   },
 };
 
-export const divergences: Partial<Record<DivergenceFlag, false>> = {
-  'routing.undeclaredParamIsEmpty': false,
-};
+export const divergences: Partial<Record<DivergenceFlag, false>> = {};
 
 export default descriptor;
